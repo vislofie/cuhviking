@@ -2,33 +2,46 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerAnimations
+public enum AnimatorTriggers
 {
-    QuickHit
+    QuickHit, CancelLong, StartLong, ProceedLong
 };
 
 public class PlayerAnimation : MonoBehaviour
 {
     [SerializeField]
-    private Dictionary<PlayerAnimations, bool> _animationsState; // if animation is allowed to be played the value of a key is true, if not then it is false
+    private Dictionary<AnimatorTriggers, bool> _triggersState = new Dictionary<AnimatorTriggers, bool>(); // if animation is allowed to be played the value of a key is true, if not then it is false
 
     private Animator _animator;
 
     private void Awake()
     {
-        _animationsState.Add(PlayerAnimations.QuickHit, true);
+        for (int i = 0; i < 4; i++)
+            _triggersState.Add((AnimatorTriggers)i, true);
+
         _animator = this.gameObject.GetComponent<Animator>();
     }
 
-    public void PlayAnimation(PlayerAnimations animation)
+    public void ActivateTrigger(AnimatorTriggers trigger)
     {
-        if (_animationsState[animation] == true)
+        if (_triggersState[trigger] == true)
         {
-            switch (animation)
+            switch (trigger)
             {
-                case PlayerAnimations.QuickHit:
+                case AnimatorTriggers.CancelLong:
+                    _animator.SetTrigger("CancelLong");
+                    break;
+                case AnimatorTriggers.ProceedLong:
+                    _animator.SetTrigger("ProceedLong");
+                    _triggersState[trigger] = false;
+                    break;
+                case AnimatorTriggers.QuickHit:
                     _animator.SetTrigger("QuickHit");
-                    _animationsState[animation] = false;
+                    _triggersState[trigger] = false;
+                    break;
+                case AnimatorTriggers.StartLong:
+                    _animator.SetTrigger("StartLong");
+                    _triggersState[trigger] = false;
                     break;
                 default:
                     Debug.Log("bruh you dum as hell like fr");
@@ -41,15 +54,23 @@ public class PlayerAnimation : MonoBehaviour
         }   
     }
 
-    public void OnAnimationEnd(PlayerAnimations animation)
+    public void OnAnimationEnd(AnimatorTriggers trigger)
     {
-        switch (animation)
+        switch (trigger)
         {
-            case PlayerAnimations.QuickHit:
-                _animationsState[animation] = true;
+            case AnimatorTriggers.CancelLong:
+                break;
+            case AnimatorTriggers.ProceedLong:
+                _triggersState[trigger] = true;
+                break;
+            case AnimatorTriggers.QuickHit:
+                _triggersState[trigger] = true;
+                break;
+            case AnimatorTriggers.StartLong:
+                _triggersState[trigger] = true;
                 break;
             default:
-                Debug.Log("wake up");
+                Debug.Log("joe biden wake up");
                 break;
         }
     }
