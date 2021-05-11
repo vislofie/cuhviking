@@ -2,46 +2,64 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AnimatorTriggers
+public enum AnimatorStates
 {
-    QuickHit, CancelLong, StartLong, ProceedLong
+    QuickHit, CancelLong, StartLong, ProceedLong, Block, Unblock
 };
 
 public class PlayerAnimation : MonoBehaviour
 {
+    private const int ANIMATOR_STATES_COUNT = 6;
+
     [SerializeField]
-    private Dictionary<AnimatorTriggers, bool> _triggersState = new Dictionary<AnimatorTriggers, bool>(); // if animation is allowed to be played the value of a key is true, if not then it is false
+    private Dictionary<AnimatorStates, bool> _triggersState = new Dictionary<AnimatorStates, bool>(); // if animation is allowed to be played the value of a key is true, if not then it is false
 
     private Animator _animator;
 
     private void Awake()
     {
-        for (int i = 0; i < 4; i++)
-            _triggersState.Add((AnimatorTriggers)i, true);
+        for (int i = 0; i < ANIMATOR_STATES_COUNT; i++)
+            _triggersState.Add((AnimatorStates)i, true);
 
         _animator = this.gameObject.GetComponent<Animator>();
     }
 
-    public void ActivateTrigger(AnimatorTriggers trigger)
+    private void ResetTriggers()
+    {
+        _animator.ResetTrigger("QuickHit");
+        _animator.ResetTrigger("CancelLong");
+        _animator.ResetTrigger("StartLong");
+        _animator.ResetTrigger("ProceedLong");
+        _animator.ResetTrigger("Block");
+    }
+
+    public void ActivateTrigger(AnimatorStates trigger)
     {
         if (_triggersState[trigger] == true)
         {
             switch (trigger)
             {
-                case AnimatorTriggers.CancelLong:
+                case AnimatorStates.Block:
+                    _animator.SetTrigger("Block");
+                    _triggersState[trigger] = false;
+                    break;
+                case AnimatorStates.CancelLong:
                     _animator.SetTrigger("CancelLong");
                     break;
-                case AnimatorTriggers.ProceedLong:
+                case AnimatorStates.ProceedLong:
                     _animator.SetTrigger("ProceedLong");
                     _triggersState[trigger] = false;
                     break;
-                case AnimatorTriggers.QuickHit:
+                case AnimatorStates.QuickHit:
                     _animator.SetTrigger("QuickHit");
                     _triggersState[trigger] = false;
                     break;
-                case AnimatorTriggers.StartLong:
+                case AnimatorStates.StartLong:
                     _animator.SetTrigger("StartLong");
                     _triggersState[trigger] = false;
+                    break;
+                case AnimatorStates.Unblock:
+                    _animator.SetTrigger("Unblock");
                     break;
                 default:
                     Debug.Log("bruh you dum as hell like fr");
@@ -51,23 +69,33 @@ public class PlayerAnimation : MonoBehaviour
         else
         {
             Debug.Log("bibibobo you tried to play the animation that is already playing!");
-        }   
+        }
     }
 
-    public void OnAnimationEnd(AnimatorTriggers trigger)
+    public void OnAnimationEnd(AnimatorStates trigger)
     {
         switch (trigger)
         {
-            case AnimatorTriggers.CancelLong:
+            case AnimatorStates.Block:
                 break;
-            case AnimatorTriggers.ProceedLong:
+            case AnimatorStates.CancelLong:
+                break;
+            case AnimatorStates.ProceedLong:
                 _triggersState[trigger] = true;
                 break;
-            case AnimatorTriggers.QuickHit:
+            case AnimatorStates.QuickHit:
                 _triggersState[trigger] = true;
                 break;
-            case AnimatorTriggers.StartLong:
+            case AnimatorStates.StartLong:
                 _triggersState[trigger] = true;
+                break;
+            case AnimatorStates.Unblock:
+                for (int i = 0; i < ANIMATOR_STATES_COUNT; i++)
+                {
+                    _triggersState[(AnimatorStates)i] = true;
+
+                    ResetTriggers();
+                }
                 break;
             default:
                 Debug.Log("joe biden wake up");
@@ -75,3 +103,4 @@ public class PlayerAnimation : MonoBehaviour
         }
     }
 }
+

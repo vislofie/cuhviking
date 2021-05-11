@@ -32,23 +32,30 @@ public class PlayerBrain : MonoBehaviour
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
 
+            bool longHit = Input.GetMouseButton(0);
+            bool block = Input.GetMouseButton(1);
             bool quickHit = Input.GetMouseButtonDown(2);
-            bool longHit = Input.GetMouseButton(1);
 
             _movementController.UpdatePosition(horizontal, vertical);
+            _movementController.UpdateRotation();
 
             if (quickHit)
             {
-                _animationController.ActivateTrigger(AnimatorTriggers.QuickHit);
+                _animationController.ActivateTrigger(AnimatorStates.QuickHit);
             }
             else if (longHit)
             {
-                _animationController.ActivateTrigger(AnimatorTriggers.StartLong);
+                _animationController.ActivateTrigger(AnimatorStates.StartLong);
             }
             else if (_longHitLastFrame && !longHit)
             {
-                _animationController.ActivateTrigger(_longHitReady ? AnimatorTriggers.ProceedLong : AnimatorTriggers.CancelLong);
+                _animationController.ActivateTrigger(_longHitReady ? AnimatorStates.ProceedLong : AnimatorStates.CancelLong);
                 _longHitReady = false;
+            }
+
+            if (block)
+            {
+                _animationController.ActivateTrigger(AnimatorStates.Block);
             }
 
             _longHitLastFrame = longHit;
