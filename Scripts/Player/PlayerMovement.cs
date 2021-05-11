@@ -7,21 +7,23 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float _movementSpeed;
 
-    [SerializeField]
-    private float _rotationSpeed;
+    private Vector3 _mousePos;
 
+    // Moves player according to horziontal and vertical input axes
     public void UpdatePosition(float horizontal, float vertical)
     {
         Vector3 newMovement = new Vector3(horizontal, 0, vertical) * Time.deltaTime * _movementSpeed;
-        transform.Translate(newMovement);
+        transform.position += newMovement;
     }
 
+    // Rotates player towards a point from mouse position
     public void UpdateRotation()
     {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 1;
-        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+        _mousePos = Input.mousePosition;
+        _mousePos.z = Camera.main.transform.position.y;
+        _mousePos = Camera.main.ScreenToWorldPoint(_mousePos);
+        _mousePos.y = transform.position.y;
 
-        // TODO: ROTATE PLAYER
+        transform.LookAt(_mousePos);
     }
 }
