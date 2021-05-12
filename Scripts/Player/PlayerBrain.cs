@@ -14,11 +14,12 @@ public class PlayerBrain : MonoBehaviour
     private PlayerMovement _movementController;
     private PlayerAnimation _animationController;
     private PlayerCombat _combatController;
+    private PlayerUI _UI;
 
     private bool _isAllowedToMove;
 
     private bool _longHitLastFrame;
-    private bool _longHitReady;
+    private bool _longHitReady; // tells whether LongHitStart has ended and animation should proceed
 
     private void Awake()
     {
@@ -26,6 +27,7 @@ public class PlayerBrain : MonoBehaviour
         _movementController = this.gameObject.GetComponent<PlayerMovement>();
         _animationController = this.gameObject.GetComponent<PlayerAnimation>();
         _combatController = this.gameObject.GetComponent<PlayerCombat>();
+        _UI = this.gameObject.GetComponent<PlayerUI>();
 
         _isAllowedToMove = true;
 
@@ -35,10 +37,10 @@ public class PlayerBrain : MonoBehaviour
 
     private void Start()
     {
-        _chars.SetMaxHealth(100);
-        _chars.ChangeHealth(100);
-        _chars.SetMaxStamina(100);
-        _chars.ChangeStamina(100);
+        SetMaxHealth(100);
+        ChangeHealth(100);
+        SetMaxStamina(100);
+        ChangeStamina(100);
 
         RestoreStaminaCycle();
     }
@@ -75,13 +77,14 @@ public class PlayerBrain : MonoBehaviour
                         _animationController.ActivateTrigger(AnimatorStates.ProceedLong);
                     else
                         _animationController.ActivateTrigger(AnimatorStates.CancelLong);
+
+                    BlockStamina();
                 }
                 else
                 {
                     _animationController.ActivateTrigger(AnimatorStates.CancelLong);
                 }
                 _longHitReady = false;
-                BlockStamina();
             }
 
             if (block && _chars.Stamina >= S_PUNISH_BLOCK)
@@ -107,7 +110,7 @@ public class PlayerBrain : MonoBehaviour
 
     private IEnumerator RestoringStamina()
     {
-        _chars.ChangeStamina(2);
+        ChangeStamina(2);
         yield return new WaitForSeconds(1);
         RestoreStaminaCycle();
     }
@@ -128,21 +131,25 @@ public class PlayerBrain : MonoBehaviour
     public void ChangeHealth(int delta)
     {
         _chars.ChangeHealth(delta);
+        _UI.UpdateHealthStatus(_chars.Health, _chars.MaxHealth);
     }
 
     public void SetMaxHealth(int value)
     {
         _chars.SetMaxHealth(value);
+        _UI.UpdateHealthStatus(_chars.Health, _chars.MaxHealth);
     }
 
     public void ChangeStamina(int delta)
     {
         _chars.ChangeStamina(delta);
         Debug.Log("Change stamina " + delta);
+        _UI.UpdateStaminaStatus(_chars.Stamina, _chars.MaxStamina);
     }
 
     public void SetMaxStamina(int value)
     {
         _chars.SetMaxStamina(value);
+        _UI.UpdateStaminaStatus(_chars.Stamina, _chars.MaxStamina);
     }
 }

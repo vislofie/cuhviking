@@ -7,6 +7,9 @@ public class PlayerCharacteristics : MonoBehaviour
     public int Health { get { return _health; } }
     public int Stamina { get { return _stamina; } }
 
+    public int MaxHealth { get { return _maxHealth; } }
+    public int MaxStamina { get { return _maxStamina; } }
+
     private int _maxHealth;
     private int _maxStamina;
 
