@@ -11,6 +11,8 @@ public class PlayerAnimation : MonoBehaviour
 {
     private const int ANIMATOR_STATES_COUNT = 6;
 
+    private PlayerBrain _brain;
+
     [SerializeField]
     private Dictionary<AnimatorStates, bool> _triggersState = new Dictionary<AnimatorStates, bool>(); // if animation is allowed to be played the value of a key is true, if not then it is false
 
@@ -22,6 +24,7 @@ public class PlayerAnimation : MonoBehaviour
             _triggersState.Add((AnimatorStates)i, true);
 
         _animator = this.gameObject.GetComponent<Animator>();
+        _brain = this.gameObject.GetComponent<PlayerBrain>();
     }
 
     private void ResetTriggers()
@@ -42,6 +45,7 @@ public class PlayerAnimation : MonoBehaviour
                 case AnimatorStates.Block:
                     _animator.SetTrigger("Block");
                     _triggersState[trigger] = false;
+                    _brain.ChangeStamina(PlayerBrain.S_PUNISH_BLOCK);
                     break;
                 case AnimatorStates.CancelLong:
                     _animator.SetTrigger("CancelLong");
@@ -49,14 +53,17 @@ public class PlayerAnimation : MonoBehaviour
                 case AnimatorStates.ProceedLong:
                     _animator.SetTrigger("ProceedLong");
                     _triggersState[trigger] = false;
+                    _brain.ChangeStamina(PlayerBrain.S_PUNISH_LONG_HIT_FINISHED);
                     break;
                 case AnimatorStates.QuickHit:
                     _animator.SetTrigger("QuickHit");
                     _triggersState[trigger] = false;
+                    _brain.ChangeStamina(PlayerBrain.S_PUNISH_QUICK_HIT);
                     break;
                 case AnimatorStates.StartLong:
                     _animator.SetTrigger("StartLong");
                     _triggersState[trigger] = false;
+                    _brain.ChangeStamina(PlayerBrain.S_PUNISH_LONG_HIT_N_FINISHED);
                     break;
                 case AnimatorStates.Unblock:
                     _animator.SetTrigger("Unblock");
@@ -82,6 +89,7 @@ public class PlayerAnimation : MonoBehaviour
                 break;
             case AnimatorStates.ProceedLong:
                 _triggersState[trigger] = true;
+                _triggersState[AnimatorStates.StartLong] = true;
                 break;
             case AnimatorStates.QuickHit:
                 _triggersState[trigger] = true;

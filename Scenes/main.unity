@@ -355,6 +355,7 @@ GameObject:
   - component: {fileID: 545090290}
   - component: {fileID: 545090289}
   - component: {fileID: 545090294}
+  - component: {fileID: 545090297}
   - component: {fileID: 545090296}
   - component: {fileID: 545090291}
   - component: {fileID: 545090293}
@@ -410,7 +411,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _movementSpeed: 5
-  _rotationSpeed: 0
 --- !u!54 &545090292
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -480,6 +480,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8c809a71ebf89dd43b1f521b828a7c9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &545090297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545090288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe4f465b30c54449b174bd3701e6ac7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &624838982
