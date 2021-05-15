@@ -75,7 +75,7 @@ public class PlayerAnimation : MonoBehaviour
         }
         else
         {
-            Debug.Log("bibibobo you tried to play the animation that is already playing!");
+            //Debug.Log("bibibobo you tried to play the animation that is already playing!");
         }
     }
 
@@ -106,7 +106,7 @@ public class PlayerAnimation : MonoBehaviour
                 }
                 break;
             default:
-                Debug.Log("joe biden wake up");
+                //Debug.Log("joe biden wake up");
                 break;
         }
     }
