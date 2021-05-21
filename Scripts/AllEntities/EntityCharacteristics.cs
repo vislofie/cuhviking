@@ -38,6 +38,7 @@ public class EntityCharacteristics : MonoBehaviour
 
     public void ChangeHealth(int delta)
     {
+        Debug.Log("changehealth was called");
         _health = Mathf.Clamp(_health + delta, 0, _maxHealth);
     }
 

@@ -6,15 +6,24 @@ using UnityEngine.UI;
 public class EnemyBrain : MonoBehaviour
 {
     [SerializeField]
+    private float _enemyToTargetDistanceLimit = 0.1f;
+
+    [SerializeField]
     private Slider _healthBar;
+    
+
 
     private EntityCharacteristics _chars;
+    private EnemyEyes _eyes;
     private EntityCombat _combatController;
+    private EnemyMovement _movementController;
 
 
     private void Awake()
     {
+        _eyes = this.GetComponent<EnemyEyes>();
         _chars = this.GetComponent<EntityCharacteristics>();
+        _movementController = this.GetComponent<EnemyMovement>();
         _chars.SetMaxHealth(100);
         _chars.SetMaxStamina(100);
 
@@ -22,6 +31,22 @@ public class EnemyBrain : MonoBehaviour
         _chars.ChangeStamina(100);
 
         UpdateHealthInUI();
+    }
+
+    private void FixedUpdate()
+    {
+        _eyes.FindVisibleTargets();
+        List<Transform> visibleTargets = _eyes.VisibleTargets;
+        if (visibleTargets.Count > 0)
+        {
+            Transform closestTarget = visibleTargets[0];
+            foreach (Transform target in visibleTargets)
+                if (Vector3.Distance(transform.position, target.position) < Vector3.Distance(transform.position, closestTarget.position))
+                    closestTarget = target;
+
+            if (Vector3.Distance(transform.position, closestTarget.position) >= _enemyToTargetDistanceLimit)
+                _movementController.MoveToTarget(closestTarget);
+        }
     }
 
     /// <summary>

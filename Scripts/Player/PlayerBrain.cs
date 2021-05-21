@@ -173,8 +173,8 @@ public class PlayerBrain : MonoBehaviour
 
     private IEnumerator RestoringStamina()
     {
-        ChangeStamina(10);
-        yield return new WaitForSeconds(1);
+        ChangeStamina(5);
+        yield return new WaitForSeconds(.1f);
         RestoreStaminaCycle();
     }
 
