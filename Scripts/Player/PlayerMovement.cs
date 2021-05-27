@@ -13,7 +13,8 @@ public class PlayerMovement : MonoBehaviour
     public void UpdatePosition(float horizontal, float vertical)
     {
         Vector3 newMovement = new Vector3(horizontal, 0, vertical) * Time.deltaTime * _movementSpeed;
-        transform.position += newMovement;
+
+        transform.Translate(newMovement, Space.World);
     }
 
     // Rotates player towards a point from mouse position

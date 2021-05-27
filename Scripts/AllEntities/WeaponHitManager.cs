@@ -11,26 +11,26 @@ public class WeaponHitManager : MonoBehaviour
 
 
     #region UNITY BUILT-IN METHODS
-    private void OnCollisionStay(Collision collision)
+    private void OnTriggerStay(Collider collider)
     {
         if (_enabled)
         {
-            if (collision.collider.CompareTag("Enemy"))
+            if (collider.CompareTag("Enemy"))
             {
-                Debug.Log(collision.gameObject.name);
-                _combatController.ReceiveHitSignal(collision.gameObject.GetComponent<EntityCombat>());
+                Debug.Log(collider.gameObject.name);
+                _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
             }
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
         if (_enabled)
         {
-            if (collision.collider.CompareTag("Enemy"))
+            if (collider.CompareTag("Enemy"))
             {
-                Debug.Log(collision.gameObject.name);
-                _combatController.ReceiveHitSignal(collision.gameObject.GetComponent<EntityCombat>());
+                Debug.Log(collider.gameObject.name);
+                _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
             }
         }
     }

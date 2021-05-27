@@ -19,5 +19,6 @@ public class EnemyMovement : MonoBehaviour
     public void MoveToTarget(Transform targetTransform)
     {
         _agent.SetDestination(targetTransform.position);
+        _agent.speed = 0.0f;
     }
 }

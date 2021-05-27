@@ -15,6 +15,7 @@ public class PlayerBrain : MonoBehaviour
     public const int S_PUNISH_QUICK_HIT = -50;
 
     private EntityCharacteristics _chars;
+    private EntityEventHandler _eventHandler;
     private PlayerMovement _movementController;
     private PlayerAnimation _animationController;
     private EntityCombat _combatController;
@@ -34,6 +35,7 @@ public class PlayerBrain : MonoBehaviour
     private void Awake()
     {
         _chars = this.gameObject.GetComponent<EntityCharacteristics>();
+        _eventHandler = this.gameObject.GetComponent<EntityEventHandler>();
         _movementController = this.gameObject.GetComponent<PlayerMovement>();
         _animationController = this.gameObject.GetComponent<PlayerAnimation>();
         _combatController = this.gameObject.GetComponent<EntityCombat>();
@@ -50,6 +52,7 @@ public class PlayerBrain : MonoBehaviour
         DisableActiveHitManager("Awake");
     }
 
+    #region BASIC-FUNCTIONS SECTION
     private void Start()
     {
         SetMaxHealth(100);
@@ -110,9 +113,14 @@ public class PlayerBrain : MonoBehaviour
             }
 
             _longHitLastFrame = longHit;
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                _eventHandler.CallHearers();
+            }
         }
     }
-
+    #endregion
 
     #region WEAPON-COMBAT SECTION
     private void FindAllWeaponManagers()

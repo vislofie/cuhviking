@@ -2,8 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyEyes : MonoBehaviour
+public class EnemySenses : MonoBehaviour
 {
+    /// <summary>
+    /// Types of entities that enemy can hear
+    /// </summary>
+    public enum EntityHearTypes { Player };
+
+    private EnemyBrain _brain;
+
     public List<Transform> VisibleTargets { get { return _visibleTargets; } }
 
     public float ViewRadius { get { return _viewRadius; } }
@@ -26,6 +33,12 @@ public class EnemyEyes : MonoBehaviour
     /// </summary>
     private List<Transform> _visibleTargets = new List<Transform>();
 
+    private void Awake()
+    {
+        _brain = this.GetComponent<EnemyBrain>();
+    }
+
+    #region FOV
     /// <summary>
     /// Finds visible targets for current entity
     /// </summary>
@@ -39,7 +52,6 @@ public class EnemyEyes : MonoBehaviour
             Transform targetTransform = targetCollider.transform;
             Vector3 dirToTarget = targetTransform.position - transform.position;
             dirToTarget.Normalize();
-            Debug.Log(Vector3.Angle(transform.forward, dirToTarget));
             if (Vector3.Angle(transform.forward, dirToTarget) < _viewAngle / 2)
             {
                 
@@ -64,4 +76,36 @@ public class EnemyEyes : MonoBehaviour
             angleInDegrees += transform.eulerAngles.y;
         return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
     }
+    #endregion
+
+    #region EARS
+    /// <summary>
+    /// Receives a signal from EarsTrigger about an enity that was "heard".
+    /// </summary>
+    /// <param name="type">Type of entity</param>
+    /// <param name="entityObj">GameObject of an entity</param>
+    public void ReceiveTriggerAdd(EntityHearTypes type, GameObject entityObj)
+    {
+        switch(type)
+        {
+            case EntityHearTypes.Player:
+                _brain.AddToHearList(type, entityObj);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void ReceiveTriggerRemove(EntityHearTypes type, GameObject entityObj)
+    {
+        switch(type)
+        {
+            case EntityHearTypes.Player:
+                _brain.RemoveFromHearList(type, entityObj);
+                break;
+            default:
+                break;
+        }
+    }
+    #endregion
 }

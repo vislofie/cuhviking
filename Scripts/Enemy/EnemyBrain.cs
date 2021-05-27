@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class EnemyBrain : MonoBehaviour
-{
+{ 
     [SerializeField]
     private float _enemyToTargetDistanceLimit = 0.1f;
 
@@ -14,14 +14,14 @@ public class EnemyBrain : MonoBehaviour
 
 
     private EntityCharacteristics _chars;
-    private EnemyEyes _eyes;
+    private EnemySenses _senses;
     private EntityCombat _combatController;
     private EnemyMovement _movementController;
 
 
     private void Awake()
     {
-        _eyes = this.GetComponent<EnemyEyes>();
+        _senses = this.GetComponent<EnemySenses>();
         _chars = this.GetComponent<EntityCharacteristics>();
         _movementController = this.GetComponent<EnemyMovement>();
         _chars.SetMaxHealth(100);
@@ -35,8 +35,8 @@ public class EnemyBrain : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _eyes.FindVisibleTargets();
-        List<Transform> visibleTargets = _eyes.VisibleTargets;
+        _senses.FindVisibleTargets();
+        List<Transform> visibleTargets = _senses.VisibleTargets;
         if (visibleTargets.Count > 0)
         {
             Transform closestTarget = visibleTargets[0];
@@ -48,6 +48,28 @@ public class EnemyBrain : MonoBehaviour
                 _movementController.MoveToTarget(closestTarget);
         }
     }
+
+    public void AddToHearList(EnemySenses.EntityHearTypes type, GameObject entityObj)
+    {
+        // TODO: add a delegate to entityeventhandler
+        entityObj.GetComponent<EntityEventHandler>().AddHearer(ReceiveNoiseSignal);
+    }
+
+    public void RemoveFromHearList(EnemySenses.EntityHearTypes type, GameObject entityObj)
+    {
+        entityObj.GetComponent<EntityEventHandler>().RemoveHearer(ReceiveNoiseSignal);
+    }
+
+    /// <summary>
+    /// Called by delegate in entityEventHandler from an entity that was in hear radius and made a noise
+    /// </summary>
+    /// <param name="obj">GameObject of an entity that made the noise</param>
+    public void ReceiveNoiseSignal(GameObject obj)
+    {
+        Debug.Log(obj.name + " made noise");
+    }
+
+
 
     /// <summary>
     /// ReceiveDamage. Gets damage and senderEntityCombat from EntityCombat script and works with it further.
