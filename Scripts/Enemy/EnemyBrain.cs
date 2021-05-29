@@ -65,6 +65,10 @@ public class EnemyBrain : MonoBehaviour
                 _movingToTarget = false;
             }
         }
+        else
+        {
+            _movingToTarget = false;
+        }
     }
 
     public void UpdateHealthInUI()
