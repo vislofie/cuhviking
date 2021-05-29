@@ -18,6 +18,12 @@ public class EnemyBrain : MonoBehaviour
     private EntityCombat _combatController;
     private EnemyMovement _movementController;
 
+    // a position that enemy is moving towards that is not an entity
+    private Vector3 _pointOfInterest;
+
+    // whether this enemy is moving to target at the moment
+    private bool _movingToTarget;
+
 
     private void Awake()
     {
@@ -33,6 +39,11 @@ public class EnemyBrain : MonoBehaviour
         UpdateHealthInUI();
     }
 
+    private void Start()
+    {
+        _movingToTarget = false;
+    }
+
     private void FixedUpdate()
     {
         _senses.FindVisibleTargets();
@@ -45,16 +56,38 @@ public class EnemyBrain : MonoBehaviour
                     closestTarget = target;
 
             if (Vector3.Distance(transform.position, closestTarget.position) >= _enemyToTargetDistanceLimit)
+            {
                 _movementController.MoveToTarget(closestTarget);
+                _movingToTarget = true;
+            }
+            else
+            {
+                _movingToTarget = false;
+            }
         }
     }
 
+    public void UpdateHealthInUI()
+    {
+        _healthBar.value = _chars.Health / (float)_chars.MaxHealth;
+    }
+
+    /// <summary>
+    /// Adds current gameObject to a list of "hearers" that belongs to the entityObj
+    /// </summary>
+    /// <param name="type">Type of entity</param>
+    /// <param name="entityObj">GameObject of an entity</param>
     public void AddToHearList(EnemySenses.EntityHearTypes type, GameObject entityObj)
     {
         // TODO: add a delegate to entityeventhandler
         entityObj.GetComponent<EntityEventHandler>().AddHearer(ReceiveNoiseSignal);
     }
 
+    /// <summary>
+    /// Remove current gameObject from a list of "hearers" that belongs to the entityObj
+    /// </summary>
+    /// <param name="type">Type of entity</param>
+    /// <param name="entityObj">GameObject of an entity</param>
     public void RemoveFromHearList(EnemySenses.EntityHearTypes type, GameObject entityObj)
     {
         entityObj.GetComponent<EntityEventHandler>().RemoveHearer(ReceiveNoiseSignal);
@@ -66,10 +99,11 @@ public class EnemyBrain : MonoBehaviour
     /// <param name="obj">GameObject of an entity that made the noise</param>
     public void ReceiveNoiseSignal(GameObject obj)
     {
-        Debug.Log(obj.name + " made noise");
+        Debug.Log(obj.name + " made noise and " + gameObject.name + "heard it");
+        _pointOfInterest = obj.transform.position;
+        if (!_movingToTarget)
+            _movementController.MoveToPosition(_pointOfInterest);
     }
-
-
 
     /// <summary>
     /// ReceiveDamage. Gets damage and senderEntityCombat from EntityCombat script and works with it further.
@@ -85,8 +119,5 @@ public class EnemyBrain : MonoBehaviour
     }
 
 
-    public void UpdateHealthInUI ()
-    {
-        _healthBar.value = _chars.Health / (float)_chars.MaxHealth;
-    }
+    
 }

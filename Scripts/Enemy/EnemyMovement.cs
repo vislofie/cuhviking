@@ -19,6 +19,14 @@ public class EnemyMovement : MonoBehaviour
     public void MoveToTarget(Transform targetTransform)
     {
         _agent.SetDestination(targetTransform.position);
-        _agent.speed = 0.0f;
+    }
+
+    /// <summary>
+    /// Moves to position using NavMeshAgent
+    /// </summary>
+    /// <param name="position">position to move to</param>
+    public void MoveToPosition(Vector3 position)
+    {
+        _agent.SetDestination(position);
     }
 }
