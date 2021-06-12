@@ -65,6 +65,21 @@ public class EnemySenses : MonoBehaviour
     }
 
     /// <summary>
+    /// Tells whether the target is inside view radius and is not hidden by any obstacles
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns>true if the target is inside the zone and false if not</returns>
+    public bool InsideTheZone(Transform target)
+    {
+        Vector3 dirToTarget = target.position - transform.position;
+        float distance = Vector3.Distance(transform.position, target.position);
+        if (!Physics.Raycast(transform.position, dirToTarget, distance, _obstaclesMask))
+            return true;
+        else
+            return false;
+    }
+
+    /// <summary>
     /// Creates a direction vector from a given angle
     /// </summary>
     /// <param name="angleInDegrees"></param>

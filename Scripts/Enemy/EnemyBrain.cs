@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum AIState { Idle, MovingToPoI, MovingToTarget, EngagingTarget, LookingAround, Patroling, Dead }
 public class EnemyBrain : MonoBehaviour
-{ 
+{
+    public AIState CurrentState { get { return _currentState; } }
+
     [SerializeField]
-    private float _enemyToTargetDistanceLimit = 0.1f;
+    private AIState _currentState;
 
     [SerializeField]
     private Slider _healthBar;
-    
-
 
     private EntityCharacteristics _chars;
     private EnemySenses _senses;
@@ -21,8 +22,24 @@ public class EnemyBrain : MonoBehaviour
     // a position that enemy is moving towards that is not an entity
     private Vector3 _pointOfInterest;
 
-    // whether this enemy is moving to target at the moment
-    private bool _movingToTarget;
+    private Transform _targetToFollow;
+
+    [SerializeField]
+    private float _closestToTargetDistance = 0.5f;
+
+    [Tooltip("Overall time for rotating and looking. \n" +
+             "Formula for one rotation: lookingAroundTime / 3 - searchingTime\n" +
+             "For example:\n" +
+             "if lookingAroundTime = 6 and searchingTime = 1 then enemy will rotate for 1 second and look for 1 second")]
+    [SerializeField]
+    private float _lookingAroundTime = 3.0f;
+    [Tooltip("Time to look after enemy has rotated")]
+    [SerializeField]
+    private float _searchingTime = 1.0f;
+
+
+    /// Coroutines
+
 
 
     private void Awake()
@@ -30,46 +47,170 @@ public class EnemyBrain : MonoBehaviour
         _senses = this.GetComponent<EnemySenses>();
         _chars = this.GetComponent<EntityCharacteristics>();
         _movementController = this.GetComponent<EnemyMovement>();
+
         _chars.SetMaxHealth(100);
         _chars.SetMaxStamina(100);
 
         _chars.ChangeHealth(100);
         _chars.ChangeStamina(100);
 
-        UpdateHealthInUI();
-    }
+        _currentState = AIState.Idle;
+        _targetToFollow = null;
 
-    private void Start()
-    {
-        _movingToTarget = false;
+        UpdateHealthInUI();
     }
 
     private void FixedUpdate()
     {
+        FindVisibleTargetsAndAct();
+    }
+
+
+    /// <summary>
+    /// Finds visible targets and acts dependant on what it has seen
+    /// </summary>
+    private void FindVisibleTargetsAndAct()
+    {
         _senses.FindVisibleTargets();
+
+        bool wasTargetBefore = false;
+        Vector3 lastTargetToFollowPosition = Vector3.zero;
+
+        if (_targetToFollow != null)
+        {
+            if (!_senses.InsideTheZone(_targetToFollow))
+            {
+                lastTargetToFollowPosition = _targetToFollow.position;
+                _targetToFollow = null;
+                wasTargetBefore = true;
+            }
+        }
+
         List<Transform> visibleTargets = _senses.VisibleTargets;
+
         if (visibleTargets.Count > 0)
         {
-            Transform closestTarget = visibleTargets[0];
+            float minDistance = Vector3.Distance(transform.position, visibleTargets[0].position);
             foreach (Transform target in visibleTargets)
-                if (Vector3.Distance(transform.position, target.position) < Vector3.Distance(transform.position, closestTarget.position))
-                    closestTarget = target;
-
-            if (Vector3.Distance(transform.position, closestTarget.position) >= _enemyToTargetDistanceLimit)
             {
-                _movementController.MoveToTarget(closestTarget);
-                _movingToTarget = true;
+                if (minDistance >= Vector3.Distance(target.position, transform.position))
+                {
+                    Debug.Log("DistanceToCur is bigguh");
+                    _targetToFollow = target;
+                    minDistance = Vector3.Distance(target.position, transform.position);
+                }
             }
-            else
+
+            
+        }
+
+
+
+        if (_targetToFollow == null)
+        {
+            if (wasTargetBefore)
             {
-                _movingToTarget = false;
+                MoveToLastSeenPosition(lastTargetToFollowPosition);
+            }
+
+            if (_movementController.IsIdle() && _currentState == AIState.MovingToPoI)
+            {
+                LookAround();
             }
         }
         else
         {
-            _movingToTarget = false;
+            bool agentStopped = _movementController.IsStopped();
+            StopCoroutine(LookingAround());
+            if (Vector3.Distance(transform.position, _targetToFollow.position) >= _closestToTargetDistance)
+            {
+                if (agentStopped)
+                    _movementController.AllowMovement();
+                MoveToTarget(_targetToFollow);
+            }
+            else
+            {
+                if (!agentStopped)
+                    _movementController.StopMovement();
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// Starts the "Look around" event.
+    /// </summary>
+    private void LookAround()
+    {
+        _currentState = AIState.LookingAround;
+        StartCoroutine(LookingAround());
+    }
+
+    /// <summary>
+    /// Used for generating random angles and rotating enemy according to this angle to allow it to "look around"
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator LookingAround()
+    {
+        int rotateCount = 0;
+        while (rotateCount != 3)
+        {
+            float randAngle = Random.Range(0, 2) == 0 ? Random.Range(75, 180) : Random.Range(-75, -180);
+            StartCoroutine(RotateInGivenTime(randAngle, _lookingAroundTime / 3 - _searchingTime));
+            yield return new WaitForSeconds(_lookingAroundTime / 3);
+            rotateCount++;
+        }
+
+        _currentState = AIState.Idle;
+    }
+
+    /// <summary>
+    /// Rotates this enemy at the given angle and within the given time
+    /// </summary>
+    /// <param name="angle">angle of rotation</param>
+    /// <param name="time">time, given to rotate</param>
+    /// <returns></returns>
+    private IEnumerator RotateInGivenTime(float angle, float time)
+    {
+        float timeBefore = Time.time;
+        Quaternion newRot = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + angle, transform.rotation.eulerAngles.z));
+        while (Time.time - timeBefore < time)
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, newRot, Time.deltaTime * time);
+            yield return new WaitForEndOfFrame();
         }
     }
+
+    /// <summary>
+    /// Moves enemy to last seen position of a target
+    /// </summary>
+    /// <param name="position">last seen position</param>
+    private void MoveToLastSeenPosition(Vector3 position)
+    {
+        _pointOfInterest = position;
+        _movementController.MoveToPosition(_pointOfInterest);
+        _currentState = AIState.MovingToPoI;
+    }
+
+    /// <summary>
+    /// Moves enemy to target
+    /// </summary>
+    /// <param name="target">target's transform</param>
+    private void MoveToTarget(Transform target)
+    {
+        _movementController.MoveToTarget(target);
+        _currentState = AIState.MovingToTarget;
+    }
+
+    /// <summary>
+    /// Stops movement of this enemy
+    /// </summary>
+    private void StopMoving()
+    {
+        _movementController.StopMovement();
+        _currentState = AIState.Idle;
+    }
+
 
     public void UpdateHealthInUI()
     {
@@ -105,8 +246,6 @@ public class EnemyBrain : MonoBehaviour
     {
         Debug.Log(obj.name + " made noise and " + gameObject.name + "heard it");
         _pointOfInterest = obj.transform.position;
-        if (!_movingToTarget)
-            _movementController.MoveToPosition(_pointOfInterest);
     }
 
     /// <summary>
