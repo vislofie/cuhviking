@@ -6,6 +6,12 @@ public enum WeaponDamages
 {
     STICK = 20
 };
+
+// state of movement of this player
+public enum MovementState
+{
+    Crouching, Walking, Running
+};
 public class PlayerBrain : MonoBehaviour
 {
     // stamina punishes for all types of attacks
@@ -27,14 +33,30 @@ public class PlayerBrain : MonoBehaviour
     private List<WeaponHitManager> _weaponManagers = new List<WeaponHitManager>();
     private int _activeWeaponIndex; // an index of a weapon that player carries at the moment; -1 if player doesnt carry anything
 
+    
+    public MovementState PlayerMovementState { get { return _playerMovementState; } }
+    [Header("Movement")]
+    [SerializeField]
+    private MovementState _playerMovementState;
+    [SerializeField]
+    private float _runStaminaPunish = 2.0f;
+
+    private float _afterActionDelayTime; // Time it takes to restore health or stamina regen after some action.
+
+    private bool _crouching;
+    private bool _walking;
+
     private bool _isAllowedToMove;
 
     private bool _longHitLastFrame;
     private bool _longHitReady; // tells whether LongHitStart has ended and animation should proceed
 
+
+
+    #region BASIC-FUNCTIONS SECTION
     private void Awake()
     {
-        _chars = this.gameObject.GetComponent<EntityCharacteristics>();
+        _chars = this.gameObject.GetComponent<PlayerChars>();
         _eventHandler = this.gameObject.GetComponent<EntityEventHandler>();
         _movementController = this.gameObject.GetComponent<PlayerMovement>();
         _animationController = this.gameObject.GetComponent<PlayerAnimation>();
@@ -50,18 +72,37 @@ public class PlayerBrain : MonoBehaviour
         _activeWeaponIndex = 0;
 
         DisableActiveHitManager("Awake");
+
+        _playerMovementState = MovementState.Walking;
+        _crouching = false;
+        _walking = true;
+
+        _afterActionDelayTime = _chars.AfterActionDelayTime;
     }
 
-    #region BASIC-FUNCTIONS SECTION
     private void Start()
     {
-        SetMaxHealth(100);
-        ChangeHealth(100);
-        SetMaxStamina(100);
-        ChangeStamina(100);
+        _chars.SetMaxHealth(100);
+        _chars.ChangeHealth(100);
+        _chars.SetMaxStamina(100);
+        _chars.ChangeStamina(100);
 
-        RestoreStaminaCycle();
-        
+        _chars.EnableHealthRegen();
+        _chars.EnableStaminaRegen();
+    }
+
+    private void Update()
+    {
+        if (_isAllowedToMove)
+        {
+            AnimationHitDecide();
+            AnimationMovementDecide();
+            
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                _eventHandler.CallHearers();
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -71,70 +112,25 @@ public class PlayerBrain : MonoBehaviour
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
 
-            bool longHit = Input.GetMouseButton(0);
-            bool block = Input.GetMouseButton(1);
-            bool quickHit = Input.GetMouseButtonDown(2);
-
             _movementController.UpdatePosition(horizontal, vertical);
             _movementController.UpdateRotation();
-
-            if (quickHit && _chars.Stamina >= -S_PUNISH_QUICK_HIT)
-            {
-                _animationController.ActivateTrigger(AnimatorStates.QuickHit);
-                BlockStamina();
-            }
-            else if (longHit && _chars.Stamina >= -S_PUNISH_LONG_HIT_N_FINISHED)
-            {
-                _animationController.ActivateTrigger(AnimatorStates.StartLong);
-                BlockStamina();
-            }
-            else if (_longHitLastFrame && !longHit)
-            {
-                if (_longHitReady)
-                {
-                    if (_chars.Stamina >= -S_PUNISH_LONG_HIT_FINISHED)
-                        _animationController.ActivateTrigger(AnimatorStates.ProceedLong);
-                    else
-                        _animationController.ActivateTrigger(AnimatorStates.CancelLong);
-
-                    BlockStamina();
-                }
-                else
-                {
-                    _animationController.ActivateTrigger(AnimatorStates.CancelLong);
-                }
-                _longHitReady = false;
-            }
-
-            if (block && _chars.Stamina >= S_PUNISH_BLOCK)
-            {
-                _animationController.ActivateTrigger(AnimatorStates.Block);
-                BlockStamina();
-            }
-
-            _longHitLastFrame = longHit;
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                _eventHandler.CallHearers();
-            }
         }
     }
     #endregion
 
     #region WEAPON-COMBAT SECTION
+    /// <summary>
+    /// Searches for weapon managers. I mean, name says it all
+    /// </summary>
     private void FindAllWeaponManagers()
     {
         _weaponManagers.Clear();
         for (int i = 0; i < _weaponHolder.childCount; i++)
-        {
             _weaponManagers.Add(_weaponHolder.GetChild(i).GetChild(0).GetComponent<WeaponHitManager>());
-        }
-
     }
 
     /// <summary>
-    /// ReceiveDamage. Gets damage and senderEntityCombat from EntityCombat script and works with it further.
+    /// ReceiveDamage. Gets damage and senderEntityCombat from EntityCombat script and works with it further
     /// </summary>
     /// <param name="damage">amount of damage</param>
     /// <param name="senderEntityCombat">EntityCombat of an entity who sent the damage</param>
@@ -155,11 +151,17 @@ public class PlayerBrain : MonoBehaviour
         DisableActiveHitManager("SendDamageToEnemy()");
     }
 
+    /// <summary>
+    /// Enables the hit manager that is responsible for current weapon
+    /// </summary>
     public void EnableActiveHitManager()
     {
         _weaponManagers[_activeWeaponIndex].Enable();
     }
 
+    /// <summary>
+    /// Disables the hit manager that is responsible for current weapon
+    /// </summary>
     public void DisableActiveHitManager(string whoCalled)
     {
         _weaponManagers[_activeWeaponIndex].Disable();
@@ -167,65 +169,133 @@ public class PlayerBrain : MonoBehaviour
     }
     #endregion
 
+    #region MOVEMENT SECTION
+    /// <summary>
+    /// Makes player crouch
+    /// </summary>
+    private void Crouch()
+    {
+        _crouching = true;
+        _walking = false;
+        _playerMovementState = MovementState.Crouching;
+        _movementController.ChangeMovementSpeed(_playerMovementState);
+    }
+
+    /// <summary>
+    /// Makes player walk normally
+    /// </summary>
+    private void Walk()
+    {
+        _crouching = false;
+        _walking = true;
+        _playerMovementState = MovementState.Walking;
+        _movementController.ChangeMovementSpeed(_playerMovementState);
+        _chars.DisableStaminaGraduateChange();
+    }
+
+    /// <summary>
+    /// Makes player run
+    /// </summary>
+    private void Run()
+    {
+        _crouching = false;
+        _walking = false;
+        _playerMovementState = MovementState.Running;
+        _movementController.ChangeMovementSpeed(_playerMovementState);
+        _chars.EnableStaminaGraduateChange(-_runStaminaPunish, true);
+    }
+    #endregion
+
     #region CHARACTERISTICS SECTION
-    private void BlockStamina()
+
+    public void ChangeStamina(float value)
     {
-        StopAllCoroutines();
-        StartCoroutine(BlockRestoringStamina());
+        _chars.ChangeStamina(value);
     }
 
-    private void RestoreStaminaCycle()
+    public void ChangeHealth(float value)
     {
-        StartCoroutine(RestoringStamina());
+        _chars.ChangeHealth(value);
     }
 
-    private IEnumerator RestoringStamina()
+    public void UpdateHealthInUI()
     {
-        ChangeStamina(5);
-        yield return new WaitForSeconds(.1f);
-        RestoreStaminaCycle();
-    }
-
-    private IEnumerator BlockRestoringStamina()
-    {
-        StopCoroutine(RestoringStamina());
-        yield return new WaitForSeconds(2);
-        StartCoroutine(RestoringStamina());
-    }
-
-    
-
-    public void ChangeHealth(int delta)
-    {
-        _chars.ChangeHealth(delta);
         _UI.UpdateHealthStatus(_chars.Health, _chars.MaxHealth);
     }
 
-    public void SetMaxHealth(int value)
+    public void UpdateStaminaInUI()
     {
-        _chars.SetMaxHealth(value);
-        _UI.UpdateHealthStatus(_chars.Health, _chars.MaxHealth);
-    }
-
-    public void ChangeStamina(int delta)
-    {
-        _chars.ChangeStamina(delta);
-        //Debug.Log("Change stamina " + delta);
-        _UI.UpdateStaminaStatus(_chars.Stamina, _chars.MaxStamina);
-    }
-
-    public void SetMaxStamina(int value)
-    {
-        _chars.SetMaxStamina(value);
         _UI.UpdateStaminaStatus(_chars.Stamina, _chars.MaxStamina);
     }
     #endregion
 
     #region ANIMATION SECTION
-    // calls when LongHitStart animation has ended
+    /// <summary>
+    /// Gets called when LongHitStart animation has ended
+    /// </summary>
     public void OnLongHitReady()
     {
         _longHitReady = true;
+    }
+
+    private void AnimationMovementDecide()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (_crouching) Walk();
+            else            Crouch();
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            if (_walking || _crouching) Run();
+            else          Walk();
+        }
+    }
+
+    /// <summary>
+    /// Decides which hit animation to play depending on the input
+    /// </summary>
+    private void AnimationHitDecide()
+    {
+        bool longHit = Input.GetMouseButton(0);
+        bool block = Input.GetMouseButton(1);
+        bool quickHit = Input.GetMouseButtonDown(2);
+
+        if (quickHit && _chars.Stamina >= -S_PUNISH_QUICK_HIT)
+        {
+            _animationController.ActivateTrigger(AnimatorStates.QuickHit);
+            _chars.DisableStaminaRegen(_afterActionDelayTime);
+        }
+        else if (longHit && _chars.Stamina >= -S_PUNISH_LONG_HIT_N_FINISHED)
+        {
+            _animationController.ActivateTrigger(AnimatorStates.StartLong);
+            _chars.DisableStaminaRegen(_afterActionDelayTime);
+        }
+        else if (_longHitLastFrame && !longHit)
+        {
+            if (_longHitReady)
+            {
+                if (_chars.Stamina >= -S_PUNISH_LONG_HIT_FINISHED)
+                    _animationController.ActivateTrigger(AnimatorStates.ProceedLong);
+                else
+                    _animationController.ActivateTrigger(AnimatorStates.CancelLong);
+
+                _chars.DisableStaminaRegen(_afterActionDelayTime);
+            }
+            else
+            {
+                _animationController.ActivateTrigger(AnimatorStates.CancelLong);
+            }
+            _longHitReady = false;
+        }
+
+        if (block && _chars.Stamina >= S_PUNISH_BLOCK)
+        {
+            _animationController.ActivateTrigger(AnimatorStates.Block);
+            _chars.DisableStaminaRegen(_afterActionDelayTime);
+        }
+
+        _longHitLastFrame = longHit;
     }
     #endregion
 }

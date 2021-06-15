@@ -4,12 +4,13 @@ using UnityEngine;
 
 public enum AnimatorStates
 {
-    QuickHit, CancelLong, StartLong, ProceedLong, Block, Unblock
+    QuickHit, CancelLong, StartLong, ProceedLong, Block, Unblock,
+    Crouch, Walk, Run
 };
 
 public class PlayerAnimation : MonoBehaviour
 {
-    private const int ANIMATOR_STATES_COUNT = 6;
+    private const int ANIMATOR_STATES_COUNT = 9;
 
     private PlayerBrain _brain;
 
@@ -67,6 +68,15 @@ public class PlayerAnimation : MonoBehaviour
                     break;
                 case AnimatorStates.Unblock:
                     _animator.SetTrigger("Unblock");
+                    break;
+                case AnimatorStates.Crouch:
+                    // TODO: add crouch triggering animation
+                    break;
+                case AnimatorStates.Walk:
+                    // TODO: add walk triggering animation
+                    break;
+                case AnimatorStates.Run:
+                    // TODO: add run triggering animation
                     break;
                 default:
                     Debug.Log("bruh you dum as hell like fr");

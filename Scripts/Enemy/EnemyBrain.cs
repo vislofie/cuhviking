@@ -37,11 +37,6 @@ public class EnemyBrain : MonoBehaviour
     [SerializeField]
     private float _searchingTime = 1.0f;
 
-
-    /// Coroutines
-
-
-
     private void Awake()
     {
         _senses = this.GetComponent<EnemySenses>();
@@ -103,8 +98,6 @@ public class EnemyBrain : MonoBehaviour
 
             
         }
-
-
 
         if (_targetToFollow == null)
         {
@@ -193,6 +186,15 @@ public class EnemyBrain : MonoBehaviour
     }
 
     /// <summary>
+    /// Moves to point of interest
+    /// </summary>
+    private void MoveToPointOfInterest()
+    {
+        _movementController.MoveToPosition(_pointOfInterest);
+        _currentState = AIState.MovingToPoI;
+    }
+
+    /// <summary>
     /// Moves enemy to target
     /// </summary>
     /// <param name="target">target's transform</param>
@@ -244,8 +246,13 @@ public class EnemyBrain : MonoBehaviour
     /// <param name="obj">GameObject of an entity that made the noise</param>
     public void ReceiveNoiseSignal(GameObject obj)
     {
-        Debug.Log(obj.name + " made noise and " + gameObject.name + "heard it");
-        _pointOfInterest = obj.transform.position;
+        //Debug.Log(obj.name + " made noise and " + gameObject.name + "heard it");
+        if (!(obj.CompareTag("Player") && obj.GetComponent<PlayerBrain>().PlayerMovementState == MovementState.Crouching &&
+            Vector3.Distance(transform.position, obj.transform.position) > _senses.SneakingHearRadius * 2))
+        {
+            _pointOfInterest = obj.transform.position;
+            MoveToPointOfInterest();
+        }
     }
 
     /// <summary>

@@ -13,11 +13,20 @@ public class EnemySenses : MonoBehaviour
 
     public List<Transform> VisibleTargets { get { return _visibleTargets; } }
 
-    public float ViewRadius { get { return _viewRadius; } }
+    public float NormalHearRadius { get { return _normalHearRadius; } }
+    public float SneakingHearRadius { get { return _sneakingHearRadius; } }
+    public float NormalViewRadius { get { return _normalViewRadius; } }
+    public float SneakingViewRadius { get { return _sneakingViewRadius; } }
     public float ViewAngle { get { return _viewAngle; } }
 
     [SerializeField]
-    private float _viewRadius;
+    private float _normalHearRadius = 5;
+    [SerializeField]
+    private float _sneakingHearRadius = 3; // hearRadius for hearing entities that are sneaking
+    [SerializeField]
+    private float _normalViewRadius = 10;
+    [SerializeField]
+    private float _sneakingViewRadius = 5; // viewRadius for seeing entities that are sneaking
     [SerializeField]
     private float _viewAngle;
 
@@ -28,6 +37,10 @@ public class EnemySenses : MonoBehaviour
     [SerializeField]
     private LayerMask _obstaclesMask;
 
+    [Tooltip("Trigger that hears other entities")]
+    [SerializeField]
+    private SphereCollider _hearTrigger;
+
     /// <summary>
     /// targets that current entity sees at current frame
     /// </summary>
@@ -36,6 +49,7 @@ public class EnemySenses : MonoBehaviour
     private void Awake()
     {
         _brain = this.GetComponent<EnemyBrain>();
+        _hearTrigger.radius = _normalHearRadius;
     }
 
     #region FOV
@@ -45,7 +59,7 @@ public class EnemySenses : MonoBehaviour
     public void FindVisibleTargets()
     {
         _visibleTargets.Clear();
-        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, _viewRadius, _entitiesMask);
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, _normalViewRadius, _entitiesMask);
 
         foreach (Collider targetCollider in targetsInViewRadius)
         {
@@ -54,11 +68,27 @@ public class EnemySenses : MonoBehaviour
             dirToTarget.Normalize();
             if (Vector3.Angle(transform.forward, dirToTarget) < _viewAngle / 2)
             {
-                
                 float distance = Vector3.Distance(transform.position, targetTransform.position);
                 if (!Physics.Raycast(transform.position, dirToTarget, distance, _obstaclesMask))
                 {
-                    _visibleTargets.Add(targetTransform);
+                    if (!targetTransform.CompareTag("Player"))
+                    {
+                        _visibleTargets.Add(targetTransform);
+                        continue;
+                    }
+
+                    if (targetTransform.GetComponent<PlayerBrain>().PlayerMovementState == MovementState.Crouching)
+                    {
+                        if (distance <= _sneakingViewRadius)
+                        {
+                            Debug.Log("distance <= sneakingViewRadius");
+                            _visibleTargets.Add(targetTransform);
+                        }
+                    }
+                    else
+                    {
+                        _visibleTargets.Add(targetTransform);
+                    }
                 }
             }   
         }
@@ -104,7 +134,7 @@ public class EnemySenses : MonoBehaviour
         switch(type)
         {
             case EntityHearTypes.Player:
-                _brain.AddToHearList(type, entityObj);
+                    _brain.AddToHearList(type, entityObj);
                 break;
             default:
                 break;
