@@ -26,6 +26,7 @@ public class PlayerBrain : MonoBehaviour
     private PlayerAnimation _animationController;
     private EntityCombat _combatController;
     private PlayerUI _UI;
+    private PlayerFOV _FOV;
 
     [Tooltip("An object that carries all weapons inside")]
     [SerializeField]
@@ -62,6 +63,7 @@ public class PlayerBrain : MonoBehaviour
         _animationController = this.gameObject.GetComponent<PlayerAnimation>();
         _combatController = this.gameObject.GetComponent<EntityCombat>();
         _UI = this.gameObject.GetComponent<PlayerUI>();
+        _FOV = this.gameObject.GetComponent<PlayerFOV>();
 
         _isAllowedToMove = true;
 
@@ -72,10 +74,6 @@ public class PlayerBrain : MonoBehaviour
         _activeWeaponIndex = 0;
 
         DisableActiveHitManager("Awake");
-
-        _playerMovementState = MovementState.Walking;
-        _crouching = false;
-        _walking = true;
 
         _afterActionDelayTime = _chars.AfterActionDelayTime;
     }
@@ -89,6 +87,8 @@ public class PlayerBrain : MonoBehaviour
 
         _chars.EnableHealthRegen();
         _chars.EnableStaminaRegen();
+
+        Walk();
     }
 
     private void Update()
@@ -98,7 +98,7 @@ public class PlayerBrain : MonoBehaviour
             AnimationHitDecide();
             AnimationMovementDecide();
             
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.H))
             {
                 _eventHandler.CallHearers();
             }
@@ -114,6 +114,9 @@ public class PlayerBrain : MonoBehaviour
 
             _movementController.UpdatePosition(horizontal, vertical);
             _movementController.UpdateRotation();
+
+            _FOV.SetAimDirection(_movementController.MousePosition - transform.position);
+            _FOV.SetOrigin(transform.position);
         }
     }
     #endregion
@@ -238,6 +241,9 @@ public class PlayerBrain : MonoBehaviour
         _longHitReady = true;
     }
 
+    /// <summary>
+    /// Decides which movement animation to play depening on the input. At current point it just decides what movement is happening right now
+    /// </summary>
     private void AnimationMovementDecide()
     {
         if (Input.GetKeyDown(KeyCode.C))

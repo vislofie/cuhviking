@@ -11,6 +11,31 @@ public class EnemySenses : MonoBehaviour
 
     private EnemyBrain _brain;
 
+    public Transform ClosestVisibleTarget
+    {
+        get
+        {
+            if (_visibleTargets.Count > 0)
+            {
+                float shortestDistance = Vector3.Distance(transform.position, _visibleTargets[0].position);
+                Transform closestTarget = _visibleTargets[0];
+                foreach (Transform target in _visibleTargets)
+                {
+                    float curDist = Vector3.Distance(transform.position, target.position);
+                    if (curDist < shortestDistance)
+                    {
+                        shortestDistance = curDist;
+                        closestTarget = target;
+                    }
+                }
+                return closestTarget;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
     public List<Transform> VisibleTargets { get { return _visibleTargets; } }
 
     public float NormalHearRadius { get { return _normalHearRadius; } }

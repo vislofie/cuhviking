@@ -14,7 +14,6 @@ public class PlayerChars : EntityCharacteristics
     public override void OnHealthChange(float healthDelta)
     {
         _brain.UpdateHealthInUI();
-        Debug.Log("health delta - " + healthDelta);
     }
 
     public override void OnHealthChange()
@@ -25,7 +24,6 @@ public class PlayerChars : EntityCharacteristics
     public override void OnStaminaChange(float staminaDelta)
     {
         _brain.UpdateStaminaInUI();
-        Debug.Log("stamina delta - " + staminaDelta);
     }
 
     public override void OnStaminaChange()

@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float _movementSpeed;
 
+    public Vector3 MousePosition { get { return _mousePos; } }
     private Vector3 _mousePos;
 
     /// <summary>

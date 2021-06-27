@@ -162,8 +162,6 @@ public class EntityCharacteristics : MonoBehaviour
     /// <summary>
     /// Enables graduate stamina regen
     /// </summary>
-    /// <param name="value">Value of adding stamina each step</param>
-    /// <param name="stepTime">Value that defines how much time is one step going to take</param>
     public void EnableStaminaRegen()
     {
         if (_graduateStaminaIncreaser != null) StopCoroutine(_graduateStaminaIncreaser);
