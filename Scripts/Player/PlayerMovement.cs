@@ -39,6 +39,12 @@ public class PlayerMovement : MonoBehaviour
         transform.LookAt(_mousePos);
     }
 
+    public void LookAt(Vector3 positionToLook)
+    {
+        positionToLook.y = transform.position.y;
+        transform.LookAt(positionToLook);
+    }
+
     /// <summary>
     /// Changes movement speed dependant on movementState of the player
     /// </summary>

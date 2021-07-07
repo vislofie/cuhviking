@@ -28,6 +28,11 @@ public class PlayerBrain : MonoBehaviour
     private PlayerUI _UI;
     private PlayerFOV _FOV;
 
+    private Rigidbody _rigidbody;
+    private Collider _playerCollider;
+
+    private Ladder _currentLadder;
+
     [Tooltip("An object that carries all weapons inside")]
     [SerializeField]
     private Transform _weaponHolder;
@@ -52,18 +57,24 @@ public class PlayerBrain : MonoBehaviour
     private bool _longHitLastFrame;
     private bool _longHitReady; // tells whether LongHitStart has ended and animation should proceed
 
+    private IEnumerator _delay; // coroutine that allows to create delays
+    private bool _delayEnded; // boolean variable responsible for telling whether the delay has finished or nah
+
 
 
     #region BASIC-FUNCTIONS SECTION
     private void Awake()
     {
-        _chars = this.gameObject.GetComponent<PlayerChars>();
-        _eventHandler = this.gameObject.GetComponent<EntityEventHandler>();
-        _movementController = this.gameObject.GetComponent<PlayerMovement>();
-        _animationController = this.gameObject.GetComponent<PlayerAnimation>();
-        _combatController = this.gameObject.GetComponent<EntityCombat>();
-        _UI = this.gameObject.GetComponent<PlayerUI>();
-        _FOV = this.gameObject.GetComponent<PlayerFOV>();
+        _chars = this.GetComponent<PlayerChars>();
+        _eventHandler = this.GetComponent<EntityEventHandler>();
+        _movementController = this.GetComponent<PlayerMovement>();
+        _animationController = this.GetComponent<PlayerAnimation>();
+        _combatController = this.GetComponent<EntityCombat>();
+        _UI = this.GetComponent<PlayerUI>();
+        _FOV = this.GetComponent<PlayerFOV>();
+
+        _rigidbody = this.GetComponent<Rigidbody>();
+        _playerCollider = this.GetComponent<Collider>();
 
         _isAllowedToMove = true;
 
@@ -76,6 +87,9 @@ public class PlayerBrain : MonoBehaviour
         DisableActiveHitManager("Awake");
 
         _afterActionDelayTime = _chars.AfterActionDelayTime;
+
+        _delayEnded = true;
+        _delay = null;
     }
 
     private void Start()
@@ -117,6 +131,22 @@ public class PlayerBrain : MonoBehaviour
 
             _FOV.SetAimDirection(_movementController.MousePosition - transform.position);
             _FOV.SetOrigin(transform.position);
+        }
+
+        if (_currentLadder != null)
+        {
+            if (Input.GetKey(KeyCode.Space) && _delayEnded)
+            {
+                _currentLadder.ClimbUp();
+                _delay = Delay(0.5f);
+                StartCoroutine(_delay);
+            }
+            else if (Input.GetKey(KeyCode.M) && _delayEnded)
+            {
+                _currentLadder.ClimbDown();
+                _delay = Delay(0.5f);
+                StartCoroutine(_delay);
+            }
         }
     }
     #endregion
@@ -206,6 +236,32 @@ public class PlayerBrain : MonoBehaviour
         _playerMovementState = MovementState.Running;
         _movementController.ChangeMovementSpeed(_playerMovementState);
         _chars.EnableStaminaGraduateChange(-_runStaminaPunish, true);
+    }
+
+    /// <summary>
+    /// Called after player stopped climbing a ladder
+    /// </summary>
+    public void RemoveLadder()
+    {
+        _currentLadder = null;
+        _rigidbody.useGravity = true;
+        _playerCollider.enabled = true;
+    }
+
+    /// <summary>
+    /// Allows player movement
+    /// </summary>
+    public void AllowMovement()
+    {
+        _isAllowedToMove = true;
+    }
+
+    /// <summary>
+    /// Forbids player movement
+    /// </summary>
+    public void ForbidMovement()
+    {
+        _isAllowedToMove = false;
     }
     #endregion
 
@@ -302,6 +358,37 @@ public class PlayerBrain : MonoBehaviour
         }
 
         _longHitLastFrame = longHit;
+    }
+    #endregion
+
+    #region COLLISION-INTERACTION
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("LadderPlatform") && Input.GetKeyDown(KeyCode.E) && _isAllowedToMove)
+        {
+            _currentLadder = other.GetComponentInParent<Ladder>();
+            other.GetComponent<LadderPlatform>().ActivateClimbing();
+            ForbidMovement();
+            _rigidbody.useGravity = false;
+            _playerCollider.enabled = false;
+
+            _movementController.LookAt(other.transform.parent.GetChild(other.transform.parent.childCount - 1).position);
+        }
+    }
+    #endregion
+
+    #region COROUTINES
+
+    /// <summary>
+    /// coroutine that allows to create delays
+    /// </summary>
+    /// <param name="sec">time in seconds</param>
+    /// <returns></returns>
+    private IEnumerator Delay(float sec)
+    {
+        _delayEnded = false;
+        yield return new WaitForSeconds(sec);
+        _delayEnded = true;
     }
     #endregion
 }
