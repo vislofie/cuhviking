@@ -6,13 +6,9 @@ public class PlayerFOV : MonoBehaviour
 {
     [SerializeField]
     private GameObject _FOVVisualizer;
-    [SerializeField]
-    private GameObject _FOVShadowReceiver;
 
     [SerializeField]
     private LayerMask _mask;
-    [SerializeField]
-    private LayerMask _shadowReceiverMask;
     [SerializeField]
     private float _viewDistance = 20.0f;
     [SerializeField]
@@ -21,7 +17,6 @@ public class PlayerFOV : MonoBehaviour
     private int _rayCount = 2;
 
     private Mesh _mesh;
-    private Mesh _shadowReceiverMesh;
     private float _startingAngle;
     Vector3 _origin;
 
@@ -30,9 +25,7 @@ public class PlayerFOV : MonoBehaviour
     private void Start()
     {
         _mesh = new Mesh();
-        _shadowReceiverMesh = new Mesh();
         _FOVVisualizer.GetComponent<MeshFilter>().mesh = _mesh;
-        _FOVShadowReceiver.GetComponent<MeshFilter>().mesh = _shadowReceiverMesh;
         _origin = Vector3.zero;
     }
 
@@ -46,12 +39,6 @@ public class PlayerFOV : MonoBehaviour
         int[] triangles = new int[_rayCount * 3];
 
         vertices[0] = _origin;
-
-        Vector3[] shadowReceiverVertices = vertices;
-        RaycastHit SRHit;
-        Physics.Raycast(_origin, Vector3.down, out SRHit, _shadowReceiverMask);
-        if (SRHit.collider != null)
-            shadowReceiverVertices[0] = SRHit.point;
 
         int vertexIndex = 1;
         int triangleIndex = 0;
@@ -67,15 +54,10 @@ public class PlayerFOV : MonoBehaviour
             }
             else
             {
-                Debug.Log("obj was hit");
                 // hit object
                 vertex = hit.point;
             }
             vertices[vertexIndex] = vertex;
-
-            Physics.Raycast(vertex, Vector3.down, out SRHit, _shadowReceiverMask);
-            if (SRHit.collider != null)
-                shadowReceiverVertices[vertexIndex] = SRHit.point;
 
             if (i > 0)
             {
@@ -93,14 +75,8 @@ public class PlayerFOV : MonoBehaviour
         _mesh.vertices = vertices;
         _mesh.uv = uv;
         _mesh.triangles = triangles;
-
-        _shadowReceiverMesh.vertices = shadowReceiverVertices;
-        _shadowReceiverMesh.uv = uv;
-        _shadowReceiverMesh.triangles = triangles;
-        
-
-        _mesh.RecalculateBounds();
-        _shadowReceiverMesh.RecalculateBounds();    
+       
+        _mesh.RecalculateBounds();  
     }
 
     public void SetOrigin(Vector3 origin)

@@ -14,6 +14,9 @@ public enum MovementState
 };
 public class PlayerBrain : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject _playerMesh;
+
     // stamina punishes for all types of attacks
     public const int S_PUNISH_LONG_HIT_FINISHED = -15;
     public const int S_PUNISH_LONG_HIT_N_FINISHED = -20;
@@ -128,10 +131,10 @@ public class PlayerBrain : MonoBehaviour
 
             _movementController.UpdatePosition(horizontal, vertical);
             _movementController.UpdateRotation();
-
-            _FOV.SetAimDirection(_movementController.MousePosition - transform.position);
-            _FOV.SetOrigin(transform.position);
         }
+
+        _FOV.SetAimDirection(_movementController.MousePosition - transform.position);
+        _FOV.SetOrigin(transform.position);
 
         if (_currentLadder != null)
         {
@@ -212,6 +215,10 @@ public class PlayerBrain : MonoBehaviour
         _walking = false;
         _playerMovementState = MovementState.Crouching;
         _movementController.ChangeMovementSpeed(_playerMovementState);
+
+        _weaponHolder.transform.localPosition = new Vector3(0.6f, -1, 0);
+        _playerMesh.transform.localPosition = new Vector3(0, -2, 0);
+        _playerMesh.transform.localRotation = Quaternion.Euler(30, 0, 0);
     }
 
     /// <summary>
@@ -224,6 +231,10 @@ public class PlayerBrain : MonoBehaviour
         _playerMovementState = MovementState.Walking;
         _movementController.ChangeMovementSpeed(_playerMovementState);
         _chars.DisableStaminaGraduateChange();
+
+        _weaponHolder.transform.localPosition = new Vector3(0.6f, 0, 0);
+        _playerMesh.transform.localPosition = new Vector3(0, -1, 0);
+        _playerMesh.transform.localRotation = Quaternion.identity;
     }
 
     /// <summary>
@@ -236,6 +247,10 @@ public class PlayerBrain : MonoBehaviour
         _playerMovementState = MovementState.Running;
         _movementController.ChangeMovementSpeed(_playerMovementState);
         _chars.EnableStaminaGraduateChange(-_runStaminaPunish, true);
+
+        _weaponHolder.transform.localPosition = new Vector3(0.6f, 0, 0);
+        _playerMesh.transform.localPosition = new Vector3(0, -1, 0);
+        _playerMesh.transform.localRotation = Quaternion.identity;
     }
 
     /// <summary>

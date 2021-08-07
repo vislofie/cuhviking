@@ -15,10 +15,20 @@ public class WeaponHitManager : MonoBehaviour
     {
         if (_enabled)
         {
-            if (collider.CompareTag("Enemy"))
+            if (_combatController.tag == "Player")
             {
-                Debug.Log(collider.gameObject.name);
-                _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
+                if (collider.CompareTag("Enemy"))
+                {
+                    Debug.Log(collider.gameObject.name);
+                    _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
+                }
+            }
+            else
+            {
+                if (collider.CompareTag("Player"))
+                {
+                    _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
+                }
             }
         }
     }
@@ -27,10 +37,20 @@ public class WeaponHitManager : MonoBehaviour
     {
         if (_enabled)
         {
-            if (collider.CompareTag("Enemy"))
+            if (_combatController.tag == "Player")
             {
-                Debug.Log(collider.gameObject.name);
-                _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
+                if (collider.CompareTag("Enemy"))
+                {
+                    Debug.Log(collider.gameObject.name);
+                    _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
+                }
+            }
+            else
+            {
+                if (collider.CompareTag("Player"))
+                {
+                    _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
+                }
             }
         }
     }

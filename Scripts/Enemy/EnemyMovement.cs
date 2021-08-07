@@ -38,6 +38,7 @@ public class EnemyMovement : MonoBehaviour
     public void StopMovement()
     {
         _agent.isStopped = true;
+        
     }
 
     public void AllowMovement()

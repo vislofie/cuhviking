@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum AIState { Idle, MovingToPoI, MovingToTarget, EngagingTarget, LookingAround, Patroling, Dead }
+public enum AIState { Idle, MovingToPoI, MovingToTarget, MovingToPatrolPoint, EngagingTarget, LookingAround, Dead }
 public class EnemyBrain : MonoBehaviour
 {
     public AIState CurrentState { get { return _currentState; } }
@@ -18,6 +18,8 @@ public class EnemyBrain : MonoBehaviour
     private EnemySenses _senses;
     private EntityCombat _combatController;
     private EnemyMovement _movementController;
+
+    private Animator _animator;
 
     // a position that enemy is moving towards that is not an entity
     private Vector3 _pointOfInterest;
@@ -37,11 +39,17 @@ public class EnemyBrain : MonoBehaviour
     [SerializeField]
     private float _searchingTime = 1.0f;
 
+
+
+    private float _attackingTimer;
+
     private void Awake()
     {
         _senses = this.GetComponent<EnemySenses>();
         _chars = this.GetComponent<EntityCharacteristics>();
         _movementController = this.GetComponent<EnemyMovement>();
+
+        _animator = this.GetComponent<Animator>();
 
         _chars.SetMaxHealth(100);
         _chars.SetMaxStamina(100);
@@ -53,12 +61,15 @@ public class EnemyBrain : MonoBehaviour
         _targetToFollow = null;
 
         UpdateHealthInUI();
+
+        _attackingTimer = 0.0f;
     }
 
     private void FixedUpdate()
     {
         FindVisibleTargetsAndAct();
     }
+
 
 
     /// <summary>
@@ -90,13 +101,10 @@ public class EnemyBrain : MonoBehaviour
             {
                 if (minDistance >= Vector3.Distance(target.position, transform.position))
                 {
-                    Debug.Log("DistanceToCur is bigguh");
                     _targetToFollow = target;
                     minDistance = Vector3.Distance(target.position, transform.position);
                 }
             }
-
-            
         }
 
         if (_targetToFollow == null)
@@ -130,32 +138,7 @@ public class EnemyBrain : MonoBehaviour
 
     }
 
-    /// <summary>
-    /// Starts the "Look around" event.
-    /// </summary>
-    private void LookAround()
-    {
-        _currentState = AIState.LookingAround;
-        StartCoroutine(LookingAround());
-    }
-
-    /// <summary>
-    /// Used for generating random angles and rotating enemy according to this angle to allow it to "look around"
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator LookingAround()
-    {
-        int rotateCount = 0;
-        while (rotateCount != 3)
-        {
-            float randAngle = Random.Range(0, 2) == 0 ? Random.Range(75, 180) : Random.Range(-75, -180);
-            StartCoroutine(RotateInGivenTime(randAngle, _lookingAroundTime / 3 - _searchingTime));
-            yield return new WaitForSeconds(_lookingAroundTime / 3);
-            rotateCount++;
-        }
-
-        _currentState = AIState.Idle;
-    }
+    
 
     /// <summary>
     /// Rotates this enemy at the given angle and within the given time
@@ -173,46 +156,6 @@ public class EnemyBrain : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
     }
-
-    /// <summary>
-    /// Moves enemy to last seen position of a target
-    /// </summary>
-    /// <param name="position">last seen position</param>
-    private void MoveToLastSeenPosition(Vector3 position)
-    {
-        _pointOfInterest = position;
-        _movementController.MoveToPosition(_pointOfInterest);
-        _currentState = AIState.MovingToPoI;
-    }
-
-    /// <summary>
-    /// Moves to point of interest
-    /// </summary>
-    private void MoveToPointOfInterest()
-    {
-        _movementController.MoveToPosition(_pointOfInterest);
-        _currentState = AIState.MovingToPoI;
-    }
-
-    /// <summary>
-    /// Moves enemy to target
-    /// </summary>
-    /// <param name="target">target's transform</param>
-    private void MoveToTarget(Transform target)
-    {
-        _movementController.MoveToTarget(target);
-        _currentState = AIState.MovingToTarget;
-    }
-
-    /// <summary>
-    /// Stops movement of this enemy
-    /// </summary>
-    private void StopMoving()
-    {
-        _movementController.StopMovement();
-        _currentState = AIState.Idle;
-    }
-
 
     public void UpdateHealthInUI()
     {
@@ -255,19 +198,78 @@ public class EnemyBrain : MonoBehaviour
         }
     }
 
+    #region STATES
     /// <summary>
-    /// ReceiveDamage. Gets damage and senderEntityCombat from EntityCombat script and works with it further.
+    /// Starts the "Look around" event.
     /// </summary>
-    /// <param name="damage">amount of damage</param>
-    /// <param name="senderEntityCombat">EntityCombat of an entity who sent the damage</param>
-    public void ReceiveDamage(int damage, EntityCombat senderEntityCombat)
+    private void LookAround()
     {
-        Debug.Log("Health before - " + _chars.Health);
-        _chars.ChangeHealth(-damage);
-        UpdateHealthInUI();
-        Debug.Log("Heatlh after - " + _chars.Health);
+        _currentState = AIState.LookingAround;
+        StartCoroutine(LookingAround());
     }
 
+    private void BeginPatrol()
+    {
 
-    
+    }
+
+    /// <summary>
+    /// Used for generating random angles and rotating enemy according to this angle to allow it to "look around"
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator LookingAround()
+    {
+        int rotateCount = 0;
+        while (rotateCount != 3)
+        {
+            float randAngle = Random.Range(0, 2) == 0 ? Random.Range(75, 180) : Random.Range(-75, -180);
+            StartCoroutine(RotateInGivenTime(randAngle, _lookingAroundTime / 3 - _searchingTime));
+            yield return new WaitForSeconds(_lookingAroundTime / 3);
+            rotateCount++;
+        }
+
+        _currentState = AIState.Idle;
+    }
+
+    /// <summary>
+    /// Moves enemy to target
+    /// </summary>
+    /// <param name="target">target's transform</param>
+    private void MoveToTarget(Transform target)
+    {
+        _movementController.MoveToTarget(target);
+        _currentState = AIState.MovingToTarget;
+    }
+
+    /// <summary>
+    /// Moves enemy to last seen position of a target
+    /// </summary>
+    /// <param name="position">last seen position</param>
+    private void MoveToLastSeenPosition(Vector3 position)
+    {
+        _pointOfInterest = position;
+        _movementController.MoveToPosition(_pointOfInterest);
+        _currentState = AIState.MovingToPoI;
+    }
+
+    /// <summary>
+    /// Moves to point of interest
+    /// </summary>
+    private void MoveToPointOfInterest()
+    {
+        _movementController.MoveToPosition(_pointOfInterest);
+        _currentState = AIState.MovingToPoI;
+    }
+
+    /// <summary>
+    /// Stops movement of this enemy
+    /// </summary>
+    private void StopMoving()
+    {
+        _movementController.StopMovement();
+        _currentState = AIState.Idle;
+    }
+
+    #endregion
+
 }
