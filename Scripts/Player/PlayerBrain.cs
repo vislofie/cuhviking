@@ -30,6 +30,7 @@ public class PlayerBrain : MonoBehaviour
     private EntityCombat _combatController;
     private PlayerUI _UI;
     private PlayerFOV _FOV;
+    private PlayerInventory _inventory;
 
     private Rigidbody _rigidbody;
     private Collider _playerCollider;
@@ -75,6 +76,7 @@ public class PlayerBrain : MonoBehaviour
         _combatController = this.GetComponent<EntityCombat>();
         _UI = this.GetComponent<PlayerUI>();
         _FOV = this.GetComponent<PlayerFOV>();
+        _inventory = this.GetComponent<PlayerInventory>();
 
         _rigidbody = this.GetComponent<Rigidbody>();
         _playerCollider = this.GetComponent<Collider>();
@@ -119,6 +121,11 @@ public class PlayerBrain : MonoBehaviour
             {
                 _eventHandler.CallHearers();
             }
+        }
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            if (_inventory.IsMainInventoryActive) _inventory.DisableMainInventory();
+            else                                  _inventory.ActivateMainInventory();
         }
     }
 
@@ -379,16 +386,25 @@ public class PlayerBrain : MonoBehaviour
     #region COLLISION-INTERACTION
     private void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.CompareTag("LadderPlatform") && Input.GetKeyDown(KeyCode.E) && _isAllowedToMove)
+        if (_isAllowedToMove)
         {
-            _currentLadder = other.GetComponentInParent<Ladder>();
-            other.GetComponent<LadderPlatform>().ActivateClimbing();
-            ForbidMovement();
-            _rigidbody.useGravity = false;
-            _playerCollider.enabled = false;
+            if (other.gameObject.CompareTag("LadderPlatform") && Input.GetKeyDown(KeyCode.E))
+            {
+                _currentLadder = other.GetComponentInParent<Ladder>();
+                other.GetComponent<LadderPlatform>().ActivateClimbing();
+                ForbidMovement();
+                _rigidbody.useGravity = false;
+                _playerCollider.enabled = false;
 
-            _movementController.LookAt(other.transform.parent.GetChild(other.transform.parent.childCount - 1).position);
+                _movementController.LookAt(other.transform.parent.GetChild(other.transform.parent.childCount - 1).position);
+            }
+            else if (other.gameObject.CompareTag("CollectableIcon") && Input.GetKeyDown(KeyCode.E))
+            {
+                _inventory.AddItem(other.transform.parent.GetComponent<Collectable>().ItemID);
+                Destroy(other.transform.parent.gameObject);
+            }
         }
+        
     }
     #endregion
 

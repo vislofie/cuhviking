@@ -138,6 +138,17 @@ public class EnemyBrain : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// ReceiveDamage. Gets damage and senderEntityCombat from EntityCombat script and works with it further
+    /// </summary>
+    /// <param name="damage">amount of damage</param>
+    /// <param name="senderEntityCombat">EntityCombat of an entity who sent the damage</param>
+    public void ReceiveDamage(int damage, EntityCombat senderEntityCombat)
+    {
+        _chars.ChangeHealth(-damage);
+        UpdateHealthInUI();
+    }
+
     
 
     /// <summary>
@@ -237,7 +248,7 @@ public class EnemyBrain : MonoBehaviour
     /// <param name="target">target's transform</param>
     private void MoveToTarget(Transform target)
     {
-        _movementController.MoveToTarget(target);
+        _movementController.SetDestination(target);
         _currentState = AIState.MovingToTarget;
     }
 
@@ -248,7 +259,7 @@ public class EnemyBrain : MonoBehaviour
     private void MoveToLastSeenPosition(Vector3 position)
     {
         _pointOfInterest = position;
-        _movementController.MoveToPosition(_pointOfInterest);
+        _movementController.SetDestination(_pointOfInterest);
         _currentState = AIState.MovingToPoI;
     }
 
@@ -257,7 +268,7 @@ public class EnemyBrain : MonoBehaviour
     /// </summary>
     private void MoveToPointOfInterest()
     {
-        _movementController.MoveToPosition(_pointOfInterest);
+        _movementController.SetDestination(_pointOfInterest);
         _currentState = AIState.MovingToPoI;
     }
 

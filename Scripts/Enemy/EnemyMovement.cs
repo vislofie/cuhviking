@@ -6,6 +6,7 @@ using UnityEngine.AI;
 public class EnemyMovement : MonoBehaviour
 {
     private NavMeshAgent _agent;
+    private Rigidbody _rigidbody;
 
     // a variable that stores Rotator coroutine
     private IEnumerator _rotCoroutine;
@@ -13,6 +14,7 @@ public class EnemyMovement : MonoBehaviour
     private void Awake()
     {
         _agent = this.GetComponent<NavMeshAgent>();
+        _rigidbody = this.GetComponent<Rigidbody>();
     }
 
     /// <summary>
@@ -50,7 +52,7 @@ public class EnemyMovement : MonoBehaviour
     /// Moves to target using NavMeshAgent.
     /// </summary>
     /// <param name="targetTransform">transform of a target</param>
-    public void MoveToTarget(Transform targetTransform)
+    public void SetDestination(Transform targetTransform)
     {
         _agent.SetDestination(targetTransform.position);
     }
@@ -59,7 +61,7 @@ public class EnemyMovement : MonoBehaviour
     /// Moves to position using NavMeshAgent
     /// </summary>
     /// <param name="position">position to move to</param>
-    public void MoveToPosition(Vector3 position)
+    public void SetDestination(Vector3 position)
     {
         _agent.SetDestination(position);
     }

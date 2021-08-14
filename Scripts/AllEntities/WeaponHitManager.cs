@@ -19,7 +19,7 @@ public class WeaponHitManager : MonoBehaviour
             {
                 if (collider.CompareTag("Enemy"))
                 {
-                    Debug.Log(collider.gameObject.name);
+                    //Debug.Log(collider.gameObject.name);
                     _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
                 }
             }
@@ -41,7 +41,6 @@ public class WeaponHitManager : MonoBehaviour
             {
                 if (collider.CompareTag("Enemy"))
                 {
-                    Debug.Log(collider.gameObject.name);
                     _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
                 }
             }

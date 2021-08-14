@@ -28,7 +28,7 @@ public class EntityCombat : MonoBehaviour
     {
         // TODO: Send damage to Brain
         if (_playersCombat) _playerBrain.ReceiveDamage(damage, senderEntityCombat);
-       // else                _enemyBrain.ReceiveDamage(damage, senderEntityCombat);
+        else                _enemyBrain.ReceiveDamage(damage, senderEntityCombat);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ public class EntityCombat : MonoBehaviour
     }
     
     /// <summary>
-    /// ReceiveHitSignal. Gets a signal from WeaponHitManager about a hit from player
+    /// ReceiveHitSignal. Gets a signal from WeaponHitManager about a hit from entity
     /// </summary>
     /// <param name="combatController">EntityCombat that got hit</param>
     public void ReceiveHitSignal(EntityCombat combatController)
