@@ -73,7 +73,7 @@ public class EnemyBrain : MonoBehaviour
 
 
     /// <summary>
-    /// Finds visible targets and acts dependant on what it has seen
+    /// Finds visible targets and acts dependant on what it sees
     /// </summary>
     private void FindVisibleTargetsAndAct()
     {
@@ -113,8 +113,7 @@ public class EnemyBrain : MonoBehaviour
             {
                 MoveToLastSeenPosition(lastTargetToFollowPosition);
             }
-
-            if (_movementController.IsIdle() && _currentState == AIState.MovingToPoI)
+            else if (_movementController.IsIdle() && _currentState == AIState.MovingToPoI)
             {
                 LookAround();
             }

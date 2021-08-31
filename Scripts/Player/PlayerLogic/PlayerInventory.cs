@@ -83,8 +83,11 @@ public class PlayerInventory : MonoBehaviour
                 Item curItem = _items[_slotsToItemID[i]];
                 itemImg.sprite = curItem.img;
                 itemImg.color = new Color(1, 1, 1, 1);
+                
 
                 itemAmount.text = 'x' + curItem.amount.ToString();
+
+                itemImg.gameObject.GetComponent<ItemDragDrop>().MakeSlotFilled();
             }
             else
             {
@@ -92,10 +95,23 @@ public class PlayerInventory : MonoBehaviour
                 itemImg.color = new Color(1, 1, 1, 0);
 
                 itemAmount.text = "";
+                itemImg.gameObject.GetComponent<ItemDragDrop>().MakeSlotEmpty();
             }
         }
     }
 
+    public void UpdateAfterMoving(int previousSlot, int newSlot)
+    {
+        int itemID = _slotsToItemID[previousSlot];
+        
+        if (_slotsToItemID[newSlot] != -1)
+            _slotsToItemID[previousSlot] = _slotsToItemID[newSlot];
+        else
+            _slotsToItemID[previousSlot] = -1;
+        _slotsToItemID[newSlot] = itemID;
+
+        // TODO: Write commentaries for the written functions AND ADD THE TRANSFER TO QUICK SLOTS!!!
+    }
     /// <summary>
     /// Adds an item to the inventory with given amount
     /// </summary>

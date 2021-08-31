@@ -57,6 +57,7 @@ public class PlayerBrain : MonoBehaviour
     private bool _walking;
 
     private bool _isAllowedToMove;
+    private bool _isAllowedToAttack;
 
     private bool _longHitLastFrame;
     private bool _longHitReady; // tells whether LongHitStart has ended and animation should proceed
@@ -82,6 +83,7 @@ public class PlayerBrain : MonoBehaviour
         _playerCollider = this.GetComponent<Collider>();
 
         _isAllowedToMove = true;
+        _isAllowedToAttack = true;
 
         _longHitLastFrame = false;
         _longHitReady = false;
@@ -114,10 +116,11 @@ public class PlayerBrain : MonoBehaviour
     {
         if (_isAllowedToMove)
         {
-            AnimationHitDecide();
+            if (_isAllowedToAttack)
+                AnimationHitDecide();
             AnimationMovementDecide();
             
-            if (Input.GetKeyDown(KeyCode.H))
+            if (Input.GetKeyDown(KeyCode.H)) // loud noise
             {
                 _eventHandler.CallHearers();
             }
@@ -284,6 +287,16 @@ public class PlayerBrain : MonoBehaviour
     public void ForbidMovement()
     {
         _isAllowedToMove = false;
+    }
+
+    public void AllowAttackAndInteractionMovement()
+    {
+        _isAllowedToAttack = true;
+    }
+
+    public void ForbidAttackAndInteractionMovement()
+    {
+        _isAllowedToAttack = false;
     }
     #endregion
 

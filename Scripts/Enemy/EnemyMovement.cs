@@ -101,4 +101,10 @@ public class EnemyMovement : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
     }
+
+  /*private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(_agent.destination, 1);
+    }*/
 }
