@@ -26,12 +26,14 @@ public class ItemSlot : MonoBehaviour, IDropHandler
         GameObject ownDropObj = this.transform.GetChild(0).gameObject;
         if (otherDropObj != null && otherDropObj.GetComponent<ItemDragDrop>().IsEmpty == false)
         {
-            
             ItemDragDrop otherDropItem = otherDropObj.GetComponent<ItemDragDrop>();
             ItemDragDrop ownDropItem = ownDropObj.GetComponent<ItemDragDrop>();
 
             int previousSlot = otherDropItem.CurrentSlotID;
+            bool previousQuickSlot = otherDropItem.QuickSlot;
             int newSlot = ownDropItem.CurrentSlotID;
+            bool newQuickSlot = ownDropItem.QuickSlot;
+
  
             ownDropObj.transform.SetParent(_UIInventory.GetSlotTransform(otherDropItem.CurrentSlotID, otherDropItem.QuickSlot));
             ownDropItem.UpdateSlotIDAndPos();
@@ -39,7 +41,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler
             otherDropObj.transform.SetParent(this.transform);
             otherDropItem.UpdateSlotIDAndPos();
 
-            _UIInventory.UpdateItemInfo(previousSlot, newSlot);
+            _UIInventory.UpdateItemInfo(previousSlot, previousQuickSlot, newSlot, newQuickSlot);
         }
     }
 

@@ -38,8 +38,8 @@ public class UIInventory : MonoBehaviour
         return slotID < _slots.Length ? (quickSlot ? _quickSlots[slotID] : _slots[slotID]) : null;
     }
 
-    public void UpdateItemInfo(int previousSlot, int currentSlot)
+    public void UpdateItemInfo(int previousSlot, bool previousQuick, int currentSlot, bool newQuick)
     {
-        _playerInventory.UpdateAfterMoving(previousSlot, currentSlot);
+        _playerInventory.UpdateAfterMoving(previousSlot, previousQuick, currentSlot, newQuick);
     }
 }

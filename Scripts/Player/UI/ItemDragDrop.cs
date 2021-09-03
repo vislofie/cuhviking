@@ -19,10 +19,6 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private ItemSlot _parentSlot;
 
     private Transform _previousParent;
-
-    
-    
-
     private void Awake()
     {
         _playerBrain = this.transform.parent.parent.parent.GetComponent<UIInventory>().PlayerBrainScript;
@@ -31,8 +27,13 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         _canvasGroup = this.GetComponent<CanvasGroup>();
 
         _isEmpty = true;
-        UpdateSlotIDAndPos();
+        
 
+    }
+
+    private void Start()
+    {
+        UpdateSlotIDAndPos();
     }
 
     public void OnPointerDown(PointerEventData eventData)
