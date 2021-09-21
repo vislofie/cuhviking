@@ -11,6 +11,8 @@ public class Collectable : MonoBehaviour
     private LayerMask _collectablesLayerMask;
     [SerializeField]
     private ITEM_IDS _itemID;
+    [SerializeField]
+    private int _amount;
     private GameObject _collectableIcon;
     private bool _iconActivated;
 
@@ -40,4 +42,15 @@ public class Collectable : MonoBehaviour
             }
         }
     }
+
+    public void SetAmount(int amount)
+    {
+        _amount = amount;
+    }
+
+    public void ChangeAmount(int dAmount)
+    {
+        _amount += dAmount;
+    }
+
 }

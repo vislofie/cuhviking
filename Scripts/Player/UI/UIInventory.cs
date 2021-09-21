@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class UIInventory : MonoBehaviour
 {
+    private const int QUICKSLOTS_ID_IN_HIERARCHY = 1;
+    private const int SLOTS_ID_IN_HIERARCHY = 2;
+
     [SerializeField]
     private PlayerBrain _playerBrain;
     private PlayerInventory _playerInventory;
@@ -15,16 +18,16 @@ public class UIInventory : MonoBehaviour
 
     private void Awake()
     {
-        _quickSlots = new RectTransform[this.transform.GetChild(0).childCount];
-        _slots = new RectTransform[this.transform.GetChild(1).childCount];
+        _quickSlots = new RectTransform[this.transform.GetChild(QUICKSLOTS_ID_IN_HIERARCHY).childCount];
+        _slots = new RectTransform[this.transform.GetChild(SLOTS_ID_IN_HIERARCHY).childCount];
 
         _playerInventory = _playerBrain.gameObject.GetComponent<PlayerInventory>();
 
         for (int i = 0; i < _slots.Length; i++)
         {
             if (i < _quickSlots.Length)
-                _quickSlots[i] = this.transform.GetChild(0).GetChild(i).GetComponent<RectTransform>();
-            _slots[i] = this.transform.GetChild(1).GetChild(i).GetComponent<RectTransform>();
+                _quickSlots[i] = this.transform.GetChild(QUICKSLOTS_ID_IN_HIERARCHY).GetChild(i).GetComponent<RectTransform>();
+            _slots[i] = this.transform.GetChild(SLOTS_ID_IN_HIERARCHY).GetChild(i).GetComponent<RectTransform>();
         }
     }
 
@@ -38,8 +41,27 @@ public class UIInventory : MonoBehaviour
         return slotID < _slots.Length ? (quickSlot ? _quickSlots[slotID] : _slots[slotID]) : null;
     }
 
+    /// <summary>
+    /// Updates 
+    /// </summary>
+    /// <param name="previousSlot"></param>
+    /// <param name="previousQuick"></param>
+    /// <param name="currentSlot"></param>
+    /// <param name="newQuick"></param>
     public void UpdateItemInfo(int previousSlot, bool previousQuick, int currentSlot, bool newQuick)
     {
         _playerInventory.UpdateAfterMoving(previousSlot, previousQuick, currentSlot, newQuick);
+    }
+
+    /// <summary>
+    /// Drops an item from the inventory, either at the player position(fromMousePos false) or at the mouse position(fromMousePos true)
+    /// </summary>
+    /// <param name="slotID">id of the slot the item was dropped from</param>
+    /// <param name="amount">amount of the items dropped</param>
+    /// <param name="fromMousePos"></param>
+    public void DropItem(int slotID, bool quickSlot, int amount = -1, bool fromMousePos = false)
+    {
+        _playerBrain.DropItem(slotID, quickSlot, amount, fromMousePos);
+        
     }
 }

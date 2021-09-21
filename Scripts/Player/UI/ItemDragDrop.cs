@@ -17,14 +17,17 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
     private ItemSlot _parentSlot;
+    private ItemContextMenu _itemContextMenu;
 
     private Transform _previousParent;
+
     private void Awake()
     {
         _playerBrain = this.transform.parent.parent.parent.GetComponent<UIInventory>().PlayerBrainScript;
         _rectTransform = this.GetComponent<RectTransform>();
         _canvas = GameObject.FindGameObjectWithTag("Canvas").GetComponent<Canvas>();
         _canvasGroup = this.GetComponent<CanvasGroup>();
+        _itemContextMenu = GameObject.FindGameObjectWithTag("ItemContextMenu").GetComponent<ItemContextMenu>();
 
         _isEmpty = true;
         
@@ -34,23 +37,43 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private void Start()
     {
         UpdateSlotIDAndPos();
+        _itemContextMenu.Deactivate();
+    }
+
+    private void Update()
+    {
+        
+    }
+
+    /// <summary>
+    /// Opens context menu of the current item
+    /// </summary>
+    private void OpenContextMenu()
+    {
+        _itemContextMenu.Activate(CurrentSlotID, QuickSlot);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-       // Debug.Log("OnPointerDown");
         _playerBrain.ForbidAttackAndInteractionMovement();
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            if (_itemContextMenu.Activated) _itemContextMenu.Deactivate();
+        }
+        else if (eventData.button == PointerEventData.InputButton.Right && !_isEmpty)
+        {
+            OpenContextMenu();
+        }
+       
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        //Debug.Log("OnPointerUp");
         _playerBrain.AllowAttackAndInteractionMovement();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        //Debug.Log("OnBeginDrag");
         if (!_isEmpty)
         {
             this.transform.parent.GetComponent<Image>().raycastTarget = false;
@@ -78,6 +101,9 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         } 
     }
 
+    /// <summary>
+    /// Updates slot ID of this item and whether its in quick slots or nah
+    /// </summary>
     public void UpdateSlotIDAndPos()
     {
         _parentSlot = this.transform.parent.GetComponent<ItemSlot>();
@@ -86,11 +112,19 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         _rectTransform.anchoredPosition = Vector2.zero;
     }
 
+
+    /// <summary>
+    /// Makes slot empty??
+    /// </summary>
     public void MakeSlotEmpty()
     {
         _isEmpty = true;
     }
 
+
+    /// <summary>
+    /// Makes it not empty??
+    /// </summary>
     public void MakeSlotFilled()
     {
         _isEmpty = false;

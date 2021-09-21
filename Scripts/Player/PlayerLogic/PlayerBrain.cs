@@ -323,6 +323,23 @@ public class PlayerBrain : MonoBehaviour
     }
     #endregion
 
+    #region INVENTORY SECTION
+    /// <summary>
+    /// Drops the item from the inventory
+    /// </summary>
+    /// <param name="slotID">id of the slot where the item is</param>
+    /// <param name="quickSlot">whether the slot is a quick one</param>
+    /// <param name="amount">how many of the item is going to be dropped. -1 means all of them</param>
+    /// <param name="fromMousePos">whether its gonna drop on mouse position or from near the player</param>
+    public void DropItem(int slotID, bool quickSlot, int amount = -1, bool fromMousePos = false)
+    {
+        GameObject prefab = _inventory.GetPrefabFromItemInSlot(slotID, quickSlot);
+        Instantiate(prefab, transform.position + new Vector3(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1)), Quaternion.identity);
+        _inventory.RemoveItem(slotID);
+
+    }
+    #endregion
+
     #region ANIMATION SECTION
     /// <summary>
     /// Gets called when LongHitStart animation has ended

@@ -34,6 +34,8 @@ public class PlayerInventory : MonoBehaviour
     private List<Transform> _quickSlots = new List<Transform>();
     private Dictionary<int, int> _slotsToItemID = new Dictionary<int, int>(); // key is the slot, value is the item id that is inside of this slot. if value is -1 then the slot is free
     private Dictionary<int, int> _quickSlotsToItemID = new Dictionary<int, int>();
+
+    private Dictionary<int, GameObject> _itemPrefabs = new Dictionary<int, GameObject>();
     private Sprite[] _sprites;
 
     private bool _enabled = false;
@@ -41,6 +43,20 @@ public class PlayerInventory : MonoBehaviour
 
     private void Awake()
     {
+        GameObject[] itemPrefabsArr = Resources.LoadAll<GameObject>("Prefabs/Collectables");
+        foreach (GameObject item in itemPrefabsArr)
+        {
+            string name = item.name;
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (name[i] == '_')
+                {
+                    _itemPrefabs.Add(int.Parse(name.Substring(0, i)), item);
+                    break;
+                }
+            }
+        }
+
         _sprites = Resources.LoadAll<Sprite>("Sprites/Items");
 
 
@@ -63,7 +79,7 @@ public class PlayerInventory : MonoBehaviour
 
     private void Update()
     {
-        //DebugInventory();
+        DebugInventory();
     }
 
     private void DebugInventory()
@@ -83,7 +99,11 @@ public class PlayerInventory : MonoBehaviour
             {
                 Debug.Log("QUICK AT KEY " + i + ", VALUE IS " + _quickSlotsToItemID[i]);
             }
-            Debug.Log("\n\n");
+            for (int i = 0; i < _itemPrefabs.Count; i++)
+            {
+                Debug.Log("ITEM PREFABS AT KEY  " + i + ", VALUE IS " + _itemPrefabs[i]);
+            }
+            Debug.Log("\n--------DIVIDER--------DIVIDER--------DIVIDER--------\n");
             _enabled = false;
         }
     }
@@ -183,12 +203,8 @@ public class PlayerInventory : MonoBehaviour
                 _slotsToItemID[newSlot] = itemID;
             }
         }
-
-        //Debug.Log(_slotsToItemID[previousSlot]);
-        //Debug.Log(_slotsToItemID[newSlot]);
-
-        // TODO: Write commentaries for the written functions AND ADD THE TRANSFER TO QUICK SLOTS!!!
     }
+
     /// <summary>
     /// Adds an item to the inventory with given amount
     /// </summary>
@@ -220,13 +236,13 @@ public class PlayerInventory : MonoBehaviour
     /// Removes an item from the inventory
     /// </summary>
     /// <param name="itemId">id of the item</param>
-    /// <param name="amount">amount of the item</param>
-    public void RemoveItem(int itemId, int amount = 1)
+    /// <param name="amount">amount of the item. -1 means remove all of it</param>
+    public void RemoveItem(int itemId, int amount = -1)
     {
         for (int i = 0; i < _items.Count; i++)
         {
             Item curItem = _items[i];
-            curItem.amount -= amount;
+            curItem.amount -= amount == -1 ? curItem.amount : amount;
 
             if (curItem.amount <= 0)
             {
@@ -242,6 +258,35 @@ public class PlayerInventory : MonoBehaviour
         }
 
         if (IsMainInventoryActive) UpdateInventory();
+    }
+
+    /// <summary>
+    /// Gets a phyiscal representation of the item from the inventory
+    /// </summary>
+    /// <param name="id">item id</param>
+    public GameObject GetPrefabFromItemID(int id)
+    {
+        if (_itemPrefabs != null && _itemPrefabs.ContainsKey(id))
+            return _itemPrefabs[id];
+        else
+            return null;
+    }
+
+    /// <summary>
+    /// Gets a physical representation of the item from the inventory
+    /// </summary>
+    /// <param name="slotID">slotID of the item to get a prefab from</param>
+    /// <param name="quickSlot">whether its a quick slot or not</param>
+    /// <returns></returns>
+    public GameObject GetPrefabFromItemInSlot(int slotID, bool quickSlot)
+    {
+        GameObject prefab = null;
+        if (quickSlot && _quickSlotsToItemID.ContainsKey(slotID))
+            prefab = GetPrefabFromItemID(_quickSlotsToItemID[slotID]);
+        else if (!quickSlot && _slotsToItemID.ContainsKey(slotID))
+                prefab = GetPrefabFromItemID(_slotsToItemID[slotID]);
+
+        return prefab;
     }
 
     public void ActivateMainInventory()
