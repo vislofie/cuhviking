@@ -40,11 +40,6 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         _itemContextMenu.Deactivate();
     }
 
-    private void Update()
-    {
-        
-    }
-
     /// <summary>
     /// Opens context menu of the current item
     /// </summary>
@@ -79,6 +74,7 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             this.transform.parent.GetComponent<Image>().raycastTarget = false;
             _canvasGroup.blocksRaycasts = false;
             _previousParent = this.transform.parent;
+            this.transform.SetParent(this.transform.parent.parent.parent);
         }
         
     }
@@ -95,7 +91,7 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         if (!_isEmpty)
         {
-            this.transform.parent.GetComponent<Image>().raycastTarget = true;
+            _previousParent.GetComponent<Image>().raycastTarget = true;
             _canvasGroup.blocksRaycasts = true;
             if (_previousParent == this.transform.parent) _rectTransform.anchoredPosition = Vector3.zero;
         } 
@@ -119,6 +115,7 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void MakeSlotEmpty()
     {
         _isEmpty = true;
+        _canvasGroup.blocksRaycasts = false;
     }
 
 
@@ -128,6 +125,7 @@ public class ItemDragDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void MakeSlotFilled()
     {
         _isEmpty = false;
+        _canvasGroup.blocksRaycasts = true;
     }
 
     

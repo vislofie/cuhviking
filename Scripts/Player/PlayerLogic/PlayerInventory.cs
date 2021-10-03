@@ -3,25 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum ItemType { WEAPON, HEAD_ARMOR, CHEST_ARMOR, ARM_ARMOR, LEG_ARMOR, BOOTS, FOOD, WATER, MEDICINE };
+public struct Item
+{
+    public int ID;
+    public int instanceID;
+    public string name;
+    public Sprite img;
+    public int amount;
+    public int maxAmount;
+    public ItemType itemType;
+
+    public Item(int id, int instanceId, string name, Sprite img, ItemType itemType, int amount = 1, int maxAmount = 64)
+    {
+        this.ID = id;
+        this.amount = amount;
+        this.maxAmount = maxAmount;
+        this.name = "";
+        this.img = img;
+        this.itemType = itemType;
+        this.instanceID = instanceId;
+    }
+}
+
 public class PlayerInventory : MonoBehaviour
 {
     public bool IsMainInventoryActive { get { return _inventoryHolder.gameObject.activeInHierarchy; } }
 
-    public struct Item
-    {
-        public int id;
-        public string name;
-        public Sprite img;
-        public int amount;
-
-        public Item(int id, string name, Sprite img, int amount = 1)
-        {
-            this.id = id;
-            this.amount = amount;
-            this.name = "";
-            this.img = img;
-        }
-    }
+    
 
     [SerializeField]
     private Transform _inventoryHolder;
@@ -33,12 +42,15 @@ public class PlayerInventory : MonoBehaviour
     private List<Transform> _inventorySlots = new List<Transform>();
     private List<Transform> _quickSlots = new List<Transform>();
     private Dictionary<int, int> _slotsToItemID = new Dictionary<int, int>(); // key is the slot, value is the item id that is inside of this slot. if value is -1 then the slot is free
+    private Dictionary<int, int> _slotsToItemInstanceID = new Dictionary<int, int>(); // key is the slot, valuse is the item instance id that is inside of this. if value is -1 then the slot is free
     private Dictionary<int, int> _quickSlotsToItemID = new Dictionary<int, int>();
+    private Dictionary<int, int> _quickSlotsToItemInstanceID = new Dictionary<int, int>();
 
     private Dictionary<int, GameObject> _itemPrefabs = new Dictionary<int, GameObject>();
     private Sprite[] _sprites;
 
     private bool _enabled = false;
+    private int _lastInstanceId; // instance id of the last added item
     
 
     private void Awake()
@@ -65,16 +77,20 @@ public class PlayerInventory : MonoBehaviour
             _inventorySlots.Add(_inventoryHolder.GetChild(i));
             _slotsToItemID.Add(i, -1);
         }
+        _slotsToItemInstanceID = _slotsToItemID;
         for (int i = 0; i < _quickSlotsHolder.childCount; i++)
         {
             _quickSlots.Add(_quickSlotsHolder.GetChild(i));
             _quickSlotsToItemID.Add(i, -1);
         }
+        _quickSlotsToItemInstanceID = _quickSlotsToItemID;
     }
 
     private void Start()
     {
+        DisableMainInventory();
         UpdateInventory();
+        _lastInstanceId = -1;
     }
 
     private void Update()
@@ -89,7 +105,7 @@ public class PlayerInventory : MonoBehaviour
         {
             for (int i = 0; i < _items.Count; i++)
             {
-                Debug.Log("i = " + i + ", items ID = " + _items[i].id + ", amount = " + _items[i].amount);
+                Debug.Log("i = " + i + ", items ID = " + _items[i].ID + ", instance ID = " + _items[i].instanceID + ", amount = " + _items[i].amount);
             }
             for (int i = 0; i < _slotsToItemID.Count; i++)
             {
@@ -112,16 +128,16 @@ public class PlayerInventory : MonoBehaviour
     /// </summary>
     public void UpdateInventory()
     {
-
         foreach (Item item in _items)
         {
-            if (!_slotsToItemID.ContainsValue(item.id) && !_quickSlotsToItemID.ContainsValue(item.id))
+            if (!_slotsToItemInstanceID.ContainsValue(item.instanceID) && !_quickSlotsToItemInstanceID.ContainsValue(item.instanceID))
             {
                 for (int i = 0; i < _slotsToItemID.Count; i++)
                 {
                     if (_slotsToItemID[i] == -1)
                     {
-                        _slotsToItemID[i] = item.id;
+                        _slotsToItemID[i] = item.ID;
+                        _slotsToItemInstanceID[i] = item.instanceID;
                         break;
                     }
                 }
@@ -209,23 +225,38 @@ public class PlayerInventory : MonoBehaviour
     /// Adds an item to the inventory with given amount
     /// </summary>
     /// <param name="itemId">id of the item</param>
+    /// <param name="itemType">type of the item</param>
     /// <param name="amount">amount of the item</param>
-    public void AddItem(int itemId, int amount = 1)
+    public void AddItem(int itemId, ItemType itemType, int amount = 1, int maxAmount = 64)
     {
         Item newItem;
 
         for (int i = 0; i < _items.Count; i++)
         {
-            if (_items[i].id == itemId)
+            if (_items[i].ID == itemId)
             {
-                newItem = _items[i];
-                newItem.amount += amount;
-                _items[i] = newItem;
-                break;
+                if (_items[i].amount == _items[i].maxAmount)
+                {
+                    newItem = _items[i];
+                    newItem.amount += amount;
+                    _items[i] = newItem;
+                    if (IsMainInventoryActive) UpdateInventory();
+                    return;
+                }
+                else
+                {
+                    newItem = new Item(itemId, _lastInstanceId + 1, _sprites[itemId].name.Remove(0, itemId.ToString().Length + 1), _sprites[itemId], itemType, amount);
+                    _lastInstanceId += 1;
+                    _items.Add(newItem);
+                    if (IsMainInventoryActive) UpdateInventory();
+                    return;
+                }
+                
             }
         }
 
-        newItem = new Item(itemId, _sprites[itemId].name.Remove(0, itemId.ToString().Length + 1), _sprites[itemId], amount);
+        newItem = new Item(itemId, _lastInstanceId + 1, _sprites[itemId].name.Remove(0, itemId.ToString().Length + 1), _sprites[itemId], itemType, amount);
+        _lastInstanceId += 1;
         _items.Add(newItem);
 
         if (IsMainInventoryActive) UpdateInventory();
@@ -248,9 +279,9 @@ public class PlayerInventory : MonoBehaviour
             {
                 _items.RemoveAt(i);
 
-                for (int j = 0; j < _slotsToItemID.Count; j++)
-                    if (_slotsToItemID[j] == curItem.id)
-                        _slotsToItemID[j] = -1;
+                for (int j = 0; j < _slotsToItemInstanceID.Count; j++)
+                    if (_slotsToItemInstanceID[j] == curItem.instanceID)
+                        _slotsToItemInstanceID[j] = -1;
 
                 break;
             }
@@ -287,6 +318,18 @@ public class PlayerInventory : MonoBehaviour
                 prefab = GetPrefabFromItemID(_slotsToItemID[slotID]);
 
         return prefab;
+    }
+
+    public Item GetItemFromSlotID(int slotID, bool quickSlot)
+    {
+        int itemID = quickSlot ? _quickSlotsToItemID[slotID] : _slotsToItemID[slotID];
+
+        foreach (Item item in _items)
+        {
+            if (item.ID == itemID) return item;
+        }
+
+        return new Item(-1, -1, "", null, ItemType.FOOD);
     }
 
     public void ActivateMainInventory()

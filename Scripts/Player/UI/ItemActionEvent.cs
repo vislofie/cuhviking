@@ -28,4 +28,9 @@ public class ItemActionEvent : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         _contextMenu.AllowPlayerInteraction();
     }
+
+    public void SetAction(ItemAction action)
+    {
+        _action = action;
+    }
 }

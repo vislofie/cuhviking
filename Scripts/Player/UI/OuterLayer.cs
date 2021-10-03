@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class OuterLayer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IEndDragHandler
+public class OuterLayer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField]
     private ItemContextMenu _contextMenu;
@@ -26,8 +26,6 @@ public class OuterLayer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
                 _playerMovementBlocked = true;
             }
         }
-            
-
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -38,11 +36,4 @@ public class OuterLayer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
             _playerMovementBlocked = false;
         }
     }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-
-    }
-
-    
 }

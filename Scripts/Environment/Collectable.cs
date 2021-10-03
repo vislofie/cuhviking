@@ -13,8 +13,16 @@ public class Collectable : MonoBehaviour
     private ITEM_IDS _itemID;
     [SerializeField]
     private int _amount;
+    [SerializeField]
+    private int _maxAmount;
+    public int Amount { get { return _amount; } }
+    public int MaxAmount { get { return _maxAmount; } }
+    [SerializeField]
+    private ItemType _itemType;
+    public ItemType Type { get { return _itemType; } }
     private GameObject _collectableIcon;
     private bool _iconActivated;
+    
 
     private void Awake()
     {

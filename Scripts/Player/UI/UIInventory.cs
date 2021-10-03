@@ -59,9 +59,9 @@ public class UIInventory : MonoBehaviour
     /// <param name="slotID">id of the slot the item was dropped from</param>
     /// <param name="amount">amount of the items dropped</param>
     /// <param name="fromMousePos"></param>
-    public void DropItem(int slotID, bool quickSlot, int amount = -1, bool fromMousePos = false)
+    public void DropItem(int slotID, bool quickSlot, int amount = -1)
     {
-        _playerBrain.DropItem(slotID, quickSlot, amount, fromMousePos);
+        _playerBrain.DropItem(slotID, quickSlot, amount);
         
     }
 }

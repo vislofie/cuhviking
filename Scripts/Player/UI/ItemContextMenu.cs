@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum ItemAction { USE, ABOUT, DROP };
+public enum ItemAction { USE, EQUIP, ABOUT, DROP };
 public class ItemContextMenu : MonoBehaviour
 {
     [SerializeField]
@@ -11,13 +11,18 @@ public class ItemContextMenu : MonoBehaviour
     [SerializeField]
     private PlayerBrain _playerBrain;
 
+    public PlayerBrain PlayerBrainScript { get { return _playerBrain; } }
     public int ActiveSlotID { get { return _activeSlotID; } }
     public bool ActiveSlotQuick { get { return _activeSlotQuick; } }
     public bool Activated { get { return _activated; } }
 
+
     private int _activeSlotID;
     private bool _activeSlotQuick;
     private bool _activated;
+
+    private Item _currentItem;
+    private ItemAction[] _currentSetOfActions = new ItemAction[3];
 
     private void Awake()
     {
@@ -38,6 +43,21 @@ public class ItemContextMenu : MonoBehaviour
     /// <param name="quickSlot">tells whether current slot is a quick slot or not</param>
     public void Activate(int slotID, bool quickSlot)
     {
+        _currentItem = _playerBrain.GetItemFromSlotID(slotID, quickSlot);
+
+        if (_currentItem.itemType == ItemType.WEAPON || _currentItem.itemType == ItemType.HEAD_ARMOR || _currentItem.itemType == ItemType.CHEST_ARMOR ||
+            _currentItem.itemType == ItemType.ARM_ARMOR || _currentItem.itemType == ItemType.LEG_ARMOR || _currentItem.itemType == ItemType.BOOTS)
+        {
+            _currentSetOfActions[0] = ItemAction.EQUIP;
+        }
+        else
+        {
+            _currentSetOfActions[0] = ItemAction.USE;
+        }
+        _currentSetOfActions[1] = ItemAction.ABOUT;
+        _currentSetOfActions[2] = ItemAction.DROP;
+
+
         EnableVisuals();
         _activeSlotID = slotID;
         _activeSlotQuick = quickSlot;
@@ -65,6 +85,8 @@ public class ItemContextMenu : MonoBehaviour
             switch (action)
             {
                 case ItemAction.USE:
+                    break;
+                case ItemAction.EQUIP:
                     break;
                 case ItemAction.ABOUT:
                     break;
@@ -113,9 +135,31 @@ public class ItemContextMenu : MonoBehaviour
     private void EnableVisuals()
     {
         this.GetComponent<Image>().enabled = true;
-        foreach (Text children in transform.GetComponentsInChildren<Text>())
+
+        for (int i = 0; i < transform.childCount; i++)
         {
-            children.enabled = true;
+            Transform child = transform.GetChild(i);
+            Text textComponent = child.GetComponent<Text>();
+            textComponent.enabled = true;
+            switch(_currentSetOfActions[i])
+            {
+                case ItemAction.EQUIP:
+                    textComponent.text = "Equip";
+                    break;
+                case ItemAction.USE:
+                    textComponent.text = "Use";
+                    break;
+                case ItemAction.ABOUT:
+                    textComponent.text = "About";
+                    break;
+                case ItemAction.DROP:
+                    textComponent.text = "Drop";
+                    break;
+                default:
+                    textComponent.text = "Bruh";
+                    break;
+            }
+            child.GetComponent<ItemActionEvent>().SetAction(_currentSetOfActions[i]);
         }
     }
 }

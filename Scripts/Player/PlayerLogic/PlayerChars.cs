@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerChars : EntityCharacteristics
 {
     private PlayerBrain _brain;
+    private float _hunger;
+    private float _thirst;
 
     private void Awake()
     {
@@ -30,4 +32,15 @@ public class PlayerChars : EntityCharacteristics
     {
         _brain.UpdateStaminaInUI();
     }
+
+    public void ChangeHunger(float hungerDelta)
+    {
+
+    }
+
+    public void ChangeThirst(float thirstDelta)
+    {
+
+    }
+    
 }
