@@ -15,10 +15,10 @@ public class Collectable : MonoBehaviour
     private int _amount;
     [SerializeField]
     private int _maxAmount;
-    public int Amount { get { return _amount; } }
-    public int MaxAmount { get { return _maxAmount; } }
     [SerializeField]
     private ItemType _itemType;
+    public int Amount { get { return _amount; } }
+    public int MaxAmount { get { return _maxAmount; } }
     public ItemType Type { get { return _itemType; } }
     private GameObject _collectableIcon;
     private bool _iconActivated;

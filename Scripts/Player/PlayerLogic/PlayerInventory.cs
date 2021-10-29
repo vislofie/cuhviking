@@ -1,57 +1,67 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum ItemType { WEAPON, HEAD_ARMOR, CHEST_ARMOR, ARM_ARMOR, LEG_ARMOR, BOOTS, FOOD, WATER, MEDICINE };
 public struct Item
 {
-    public int ID;
-    public int instanceID;
-    public string name;
-    public Sprite img;
-    public int amount;
-    public int maxAmount;
-    public ItemType itemType;
+    public int ID { get { return id; } }
+    public int Slot { get { return slot; } }
+    public bool QuickSlot { get { return quickSlot; } }
+    public int Amount { get { return amount; } }
+    public int MaxAmount { get { return maxAmount; } }
+    public int CurrentItemInstance { get { return CurrentItemInstance; } } // which separate instance of items with this id in the inventory
+    public Sprite ItemSprite { get { return sprite; } }
+    public string Name { get { return name; } }
+    public ItemType Type { get { return itemType; } }
 
-    public Item(int id, int instanceId, string name, Sprite img, ItemType itemType, int amount = 1, int maxAmount = 64)
+    private int id;
+    private int slot;
+    private bool quickSlot;
+    private int amount;
+    private int maxAmount;
+    private int curItemInstance;
+    private Sprite sprite;
+    private string name;
+    private ItemType itemType;
+
+    public Item(int id, int slot, bool quickSlot, int curItemInstance, Sprite sprite, string name, ItemType itemType, int amount = 1, int maxAmount = 64)
     {
-        this.ID = id;
+        this.id = id;
+        this.slot = slot;
+        this.quickSlot = quickSlot;
         this.amount = amount;
         this.maxAmount = maxAmount;
-        this.name = "";
-        this.img = img;
+        this.curItemInstance = curItemInstance;
+        this.sprite = sprite;
+        this.name = name;
         this.itemType = itemType;
-        this.instanceID = instanceId;
+    }
+
+    public void ChangeAmount(int amount)
+    {
+        if (this.amount + amount <= this.maxAmount)
+        {
+            this.amount += amount;
+        }
+        else
+        {
+            Debug.Log("Amount added is more than you can add!!");
+        }
     }
 }
-
 public class PlayerInventory : MonoBehaviour
 {
-    public bool IsMainInventoryActive { get { return _inventoryHolder.gameObject.activeInHierarchy; } }
-
-    
-
     [SerializeField]
-    private Transform _inventoryHolder;
+    private Transform _inventorySlotsHolder;
     [SerializeField]
-    private Transform _quickSlotsHolder;
+    private Transform _inventoryQuickSlotsHolder;
+    private Transform[] _inventorySlotTransforms;
+    private Transform[] _inventoryQuickSlotTransforms;
 
-    
-    private List<Item> _items = new List<Item>(); // items that player holds
-    private List<Transform> _inventorySlots = new List<Transform>();
-    private List<Transform> _quickSlots = new List<Transform>();
-    private Dictionary<int, int> _slotsToItemID = new Dictionary<int, int>(); // key is the slot, value is the item id that is inside of this slot. if value is -1 then the slot is free
-    private Dictionary<int, int> _slotsToItemInstanceID = new Dictionary<int, int>(); // key is the slot, valuse is the item instance id that is inside of this. if value is -1 then the slot is free
-    private Dictionary<int, int> _quickSlotsToItemID = new Dictionary<int, int>();
-    private Dictionary<int, int> _quickSlotsToItemInstanceID = new Dictionary<int, int>();
+    private List<Item> _inventoryItems = new List<Item>();
 
     private Dictionary<int, GameObject> _itemPrefabs = new Dictionary<int, GameObject>();
     private Sprite[] _sprites;
-
-    private bool _enabled = false;
-    private int _lastInstanceId; // instance id of the last added item
-    
 
     private void Awake()
     {
@@ -71,277 +81,177 @@ public class PlayerInventory : MonoBehaviour
 
         _sprites = Resources.LoadAll<Sprite>("Sprites/Items");
 
+        _inventorySlotTransforms = new Transform[_inventorySlotsHolder.childCount];
+        _inventoryQuickSlotTransforms = new Transform[_inventoryQuickSlotsHolder.childCount];
 
-        for (int i = 0; i < _inventoryHolder.childCount; i++)
-        {
-            _inventorySlots.Add(_inventoryHolder.GetChild(i));
-            _slotsToItemID.Add(i, -1);
-        }
-        _slotsToItemInstanceID = _slotsToItemID;
-        for (int i = 0; i < _quickSlotsHolder.childCount; i++)
-        {
-            _quickSlots.Add(_quickSlotsHolder.GetChild(i));
-            _quickSlotsToItemID.Add(i, -1);
-        }
-        _quickSlotsToItemInstanceID = _quickSlotsToItemID;
+        for (int i = 0; i < _inventorySlotTransforms.Length; i++)
+            _inventorySlotTransforms[i] = _inventorySlotsHolder.GetChild(i);
+        for (int i = 0; i < _inventoryQuickSlotTransforms.Length; i++)
+            _inventoryQuickSlotTransforms[i] = _inventoryQuickSlotsHolder.GetChild(i);
     }
 
     private void Start()
     {
-        DisableMainInventory();
-        UpdateInventory();
-        _lastInstanceId = -1;
+        AddItem(0, 26);
+        RemoveItem(_inventorySlotTransforms[2].GetComponent<InventorySlot>().CurrentItem);
+        RemoveItem(_inventorySlotTransforms[3].GetComponent<InventorySlot>().CurrentItem, 2);
     }
 
     private void Update()
     {
-        DebugInventory();
-    }
-
-    private void DebugInventory()
-    {
-        if (Input.GetKeyDown(KeyCode.Tab)) _enabled = !_enabled;
-        if (_enabled)
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            for (int i = 0; i < _items.Count; i++)
+            Debug.Log("ITEMS\n");
+            for (int i = 0; i < _inventoryItems.Count; i++)
             {
-                Debug.Log("i = " + i + ", items ID = " + _items[i].ID + ", instance ID = " + _items[i].instanceID + ", amount = " + _items[i].amount);
+                Debug.Log("ITEM AT SLOT ID " + _inventoryItems[i].Slot + " WITH A NAME " + _inventoryItems[i].Name + " IS " + (_inventoryItems[i].QuickSlot ? "A QUICK" : "NOT A QUICK") + "SLOT HAS ID " + _inventoryItems[i].ID + "; AMOUNT = " + _inventoryItems[i].Amount);
             }
-            for (int i = 0; i < _slotsToItemID.Count; i++)
-            {
-                Debug.Log("INVENTORY AT KEY " + i + ", VALUE IS " + _slotsToItemID[i]);
-            }
-            for (int i = 0; i < _quickSlotsToItemID.Count; i++)
-            {
-                Debug.Log("QUICK AT KEY " + i + ", VALUE IS " + _quickSlotsToItemID[i]);
-            }
-            for (int i = 0; i < _itemPrefabs.Count; i++)
-            {
-                Debug.Log("ITEM PREFABS AT KEY  " + i + ", VALUE IS " + _itemPrefabs[i]);
-            }
-            Debug.Log("\n--------DIVIDER--------DIVIDER--------DIVIDER--------\n");
-            _enabled = false;
         }
     }
-    /// <summary>
-    /// updates visual info of your inventory
-    /// </summary>
-    public void UpdateInventory()
+
+    public void AddItem(int itemID, int amount)
     {
-        foreach (Item item in _items)
+        foreach (Item item in _inventoryItems)
         {
-            if (!_slotsToItemInstanceID.ContainsValue(item.instanceID) && !_quickSlotsToItemInstanceID.ContainsValue(item.instanceID))
+            if (item.ID == itemID) // если среди вещей в инвентаре есть тот же айдишник, что и данный в аргументах
             {
-                for (int i = 0; i < _slotsToItemID.Count; i++)
+                int tempAmount = Mathf.Clamp(amount, 0, item.MaxAmount - item.Amount);
+                amount -= tempAmount;
+                item.ChangeAmount(tempAmount);
+            }
+        }
+
+        while (amount > 0)
+        {
+            int firstFreeSlot = GetFirstFreeSlotID(false);
+            bool quickSlot = false;
+            if (firstFreeSlot == -1)
+            {
+                firstFreeSlot = GetFirstFreeSlotID(true);
+                Debug.Log(firstFreeSlot);
+                quickSlot = true;
+                if (firstFreeSlot == -1) // свободных слотов ну вообще нет
                 {
-                    if (_slotsToItemID[i] == -1)
-                    {
-                        _slotsToItemID[i] = item.ID;
-                        _slotsToItemInstanceID[i] = item.instanceID;
-                        break;
-                    }
+                    Debug.Log("Inventory is full!!!!!");
+                    break;
                 }
             }
-        }
 
-        UpdateVisualOfHolders(_slotsToItemID, _inventorySlots);
-        UpdateVisualOfHolders(_quickSlotsToItemID, _quickSlots);
-    }
-
-    /// <summary>
-    /// Updated visual information about items in different item holders(quick slots and regular inventory)
-    /// </summary>
-    /// <param name="slotDictionary">dictionary of the holder</param>
-    /// <param name="slotHolder">children of the holder</param>
-    private void UpdateVisualOfHolders(Dictionary<int, int> slotDictionary, List<Transform> slotHolder)
-    {
-        for (int i = 0; i < slotHolder.Count; i++)
-        {
-            Image itemImg = slotHolder[i].GetChild(0).GetComponent<Image>();
-            Text itemAmount = itemImg.transform.GetChild(0).GetComponent<Text>();
-
-            if (slotDictionary[i] != -1)
+            if (firstFreeSlot != -1)
             {
-                Item curItem = _items[slotDictionary[i]];
-                itemImg.sprite = curItem.img;
-                itemImg.color = new Color(1, 1, 1, 1);
+                int curInstance = GetNextInstanceNumberOfSameItem(itemID);
+                int amountToAdd = Mathf.Clamp(amount, 1, GetMaxAmountByItemID(itemID));
+                amount -= amountToAdd;
+                Item item = new Item(itemID, firstFreeSlot, quickSlot, curInstance, _sprites[itemID], _sprites[itemID].name.Remove(0, itemID.ToString().Length + 1),
+                                        _itemPrefabs[itemID].GetComponent<Collectable>().Type, amountToAdd, GetMaxAmountByItemID(itemID));
 
-
-                itemAmount.text = 'x' + curItem.amount.ToString();
-
-                itemImg.gameObject.GetComponent<ItemDragDrop>().MakeSlotFilled();
-            }
-            else
-            {
-                itemImg.sprite = null;
-                itemImg.color = new Color(1, 1, 1, 0);
-
-                itemAmount.text = "";
-                itemImg.gameObject.GetComponent<ItemDragDrop>().MakeSlotEmpty();
+                InventorySlot desiredSlot = quickSlot ? _inventoryQuickSlotTransforms[firstFreeSlot].GetComponent<InventorySlot>() : _inventorySlotTransforms[firstFreeSlot].GetComponent<InventorySlot>();
+                if (desiredSlot.Free)
+                {
+                    Debug.Log("DesiredSlot Free");
+                    desiredSlot.Fill(item);
+                }
+                _inventoryItems.Add(item);
             }
         }
     }
 
     /// <summary>
-    /// Updates id info after moving an item from one slot to another
+    /// Removes item from the inventory
     /// </summary>
-    /// <param name="previousSlot">the slot the item was moved FROM</param>
-    /// <param name="previousQuick">was the previous slot a quick slot</param>
-    /// <param name="newSlot">the slot the item was moved TO</param>
-    /// <param name="newQuick">was the new slot a quick slot</param>
-    public void UpdateAfterMoving(int previousSlot, bool previousQuick, int newSlot, bool newQuick)
+    /// <param name="itemID">id of the item to remove</param>
+    /// <param name="amount">amount to remove. -1 means all of it</param>
+    public void RemoveItem(int itemID, int amount = -1)
     {
-        if (previousQuick)
+
+    }
+
+    /// <summary>
+    /// Removes item from the ivnentory
+    /// </summary>
+    /// <param name="item">item to remove</param>
+    /// <param name="amount">amount to remove. -1 means all of it</param>
+    public void RemoveItem(Item item, int amount = -1)
+    {
+        if (_inventoryItems.Contains(item))
         {
-            int itemID = _quickSlotsToItemID[previousSlot];
-            if (newQuick)
+            int itemIDInList = -1;
+            for (int i = 0; i < _inventoryItems.Count; i++)
+                if (_inventoryItems[i].Equals(item))
+                    itemIDInList = i;
+
+            bool quickSlot = item.QuickSlot;
+            int slotID = item.Slot;
+            InventorySlot slot = quickSlot ? _inventoryQuickSlotTransforms[slotID].GetComponent<InventorySlot>() : _inventorySlotTransforms[slotID].GetComponent<InventorySlot>();
+
+            if (amount == -1 || _inventoryItems[itemIDInList].Amount - amount == 0)
             {
-                _quickSlotsToItemID[previousSlot] = _quickSlotsToItemID[newSlot];
-                _quickSlotsToItemID[newSlot] = itemID;
+                slot.Emptify();
+                _inventoryItems.Remove(item);
             }
             else
             {
-                _quickSlotsToItemID[previousSlot] = _slotsToItemID[newSlot];
-                _slotsToItemID[newSlot] = itemID;
+                item.ChangeAmount(-amount);
+                _inventoryItems[itemIDInList] = item;
+                slot.Emptify();
+                slot.Fill(item);
+            }
+        }  
+    }
+
+    private int GetFirstFreeSlotID(bool quickSlot)
+    {
+        int firstFreeSlot = -1;
+
+        if (quickSlot)
+        {
+            for (int i = 0; i < _inventoryQuickSlotTransforms.Length; i++)
+            {
+                if (_inventoryQuickSlotTransforms[i].GetComponent<InventorySlot>().Free)
+                {
+                    firstFreeSlot = i;
+                    break;
+                }
             }
         }
         else
         {
-            int itemID = _slotsToItemID[previousSlot];
-            if (newQuick)
+            for (int i = 0; i < _inventorySlotTransforms.Length; i++)
             {
-                _slotsToItemID[previousSlot] = _quickSlotsToItemID[newSlot];
-                _quickSlotsToItemID[newSlot] = itemID;
-            }
-            else
-            {
-                _slotsToItemID[previousSlot] = _slotsToItemID[newSlot];
-                _slotsToItemID[newSlot] = itemID;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Adds an item to the inventory with given amount
-    /// </summary>
-    /// <param name="itemId">id of the item</param>
-    /// <param name="itemType">type of the item</param>
-    /// <param name="amount">amount of the item</param>
-    public void AddItem(int itemId, ItemType itemType, int amount = 1, int maxAmount = 64)
-    {
-        Item newItem;
-
-        for (int i = 0; i < _items.Count; i++)
-        {
-            if (_items[i].ID == itemId)
-            {
-                if (_items[i].amount == _items[i].maxAmount)
+                if (_inventorySlotTransforms[i].GetComponent<InventorySlot>().Free)
                 {
-                    newItem = _items[i];
-                    newItem.amount += amount;
-                    _items[i] = newItem;
-                    if (IsMainInventoryActive) UpdateInventory();
-                    return;
+                    firstFreeSlot = i;
+                    break;
                 }
-                else
-                {
-                    newItem = new Item(itemId, _lastInstanceId + 1, _sprites[itemId].name.Remove(0, itemId.ToString().Length + 1), _sprites[itemId], itemType, amount);
-                    _lastInstanceId += 1;
-                    _items.Add(newItem);
-                    if (IsMainInventoryActive) UpdateInventory();
-                    return;
-                }
-                
             }
         }
 
-        newItem = new Item(itemId, _lastInstanceId + 1, _sprites[itemId].name.Remove(0, itemId.ToString().Length + 1), _sprites[itemId], itemType, amount);
-        _lastInstanceId += 1;
-        _items.Add(newItem);
 
-        if (IsMainInventoryActive) UpdateInventory();
+        return firstFreeSlot;
     }
 
-
-    /// <summary>
-    /// Removes an item from the inventory
-    /// </summary>
-    /// <param name="itemId">id of the item</param>
-    /// <param name="amount">amount of the item. -1 means remove all of it</param>
-    public void RemoveItem(int itemId, int amount = -1)
+    private int GetNextInstanceNumberOfSameItem(int itemID)
     {
-        for (int i = 0; i < _items.Count; i++)
+        int curInstance = 0;
+        foreach (Item item in _inventoryItems)
         {
-            Item curItem = _items[i];
-            curItem.amount -= amount == -1 ? curItem.amount : amount;
-
-            if (curItem.amount <= 0)
+            if (item.ID == itemID)
             {
-                _items.RemoveAt(i);
-
-                for (int j = 0; j < _slotsToItemInstanceID.Count; j++)
-                    if (_slotsToItemInstanceID[j] == curItem.instanceID)
-                        _slotsToItemInstanceID[j] = -1;
-
-                break;
+                curInstance++;
             }
-            _items[i] = curItem;
         }
 
-        if (IsMainInventoryActive) UpdateInventory();
+        return curInstance;
     }
 
-    /// <summary>
-    /// Gets a phyiscal representation of the item from the inventory
-    /// </summary>
-    /// <param name="id">item id</param>
-    public GameObject GetPrefabFromItemID(int id)
+    private int GetMaxAmountByItemID(int itemID)
     {
-        if (_itemPrefabs != null && _itemPrefabs.ContainsKey(id))
-            return _itemPrefabs[id];
-        else
-            return null;
-    }
-
-    /// <summary>
-    /// Gets a physical representation of the item from the inventory
-    /// </summary>
-    /// <param name="slotID">slotID of the item to get a prefab from</param>
-    /// <param name="quickSlot">whether its a quick slot or not</param>
-    /// <returns></returns>
-    public GameObject GetPrefabFromItemInSlot(int slotID, bool quickSlot)
-    {
-        GameObject prefab = null;
-        if (quickSlot && _quickSlotsToItemID.ContainsKey(slotID))
-            prefab = GetPrefabFromItemID(_quickSlotsToItemID[slotID]);
-        else if (!quickSlot && _slotsToItemID.ContainsKey(slotID))
-                prefab = GetPrefabFromItemID(_slotsToItemID[slotID]);
-
-        return prefab;
-    }
-
-    public Item GetItemFromSlotID(int slotID, bool quickSlot)
-    {
-        int itemID = quickSlot ? _quickSlotsToItemID[slotID] : _slotsToItemID[slotID];
-
-        foreach (Item item in _items)
+        switch(itemID)
         {
-            if (item.ID == itemID) return item;
+            case 0: // AXE
+                return 3;
+            default:
+                return -1;
         }
-
-        return new Item(-1, -1, "", null, ItemType.FOOD);
     }
-
-    public void ActivateMainInventory()
-    {
-        UpdateInventory();
-        _inventoryHolder.gameObject.SetActive(true);
-    }
-
-    public void DisableMainInventory()
-    {
-        _inventoryHolder.gameObject.SetActive(false);
-    }
-
-
 }
