@@ -116,7 +116,7 @@ public class PlayerBrain : MonoBehaviour
     {
         if (_isAllowedToMove)
         {
-            if (_isAllowedToAttack)
+            if (_isAllowedToAttack && !_inventory.MouseInInventory)
                 AnimationHitDecide();
             AnimationMovementDecide();
             
@@ -404,6 +404,13 @@ public class PlayerBrain : MonoBehaviour
                 _playerCollider.enabled = false;
 
                 _movementController.LookAt(other.transform.parent.GetChild(other.transform.parent.childCount - 1).position);
+            }
+            if (other.gameObject.CompareTag("CollectableIcon") && Input.GetKeyDown(KeyCode.E))
+            {
+                Collectable pickedItem = other.transform.parent.gameObject.GetComponent<Collectable>();
+                _inventory.AddItem(pickedItem.ItemID, pickedItem.Amount);
+                pickedItem.DestroyItself();
+
             }
         }
         

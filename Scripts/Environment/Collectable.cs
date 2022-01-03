@@ -35,18 +35,18 @@ public class Collectable : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, float.PositiveInfinity, _collectablesLayerMask))
         {
-            if (!_iconActivated)
+            if (hit.collider.gameObject == this.gameObject && !_iconActivated)
             {
                 _iconActivated = true;
                 _collectableIcon.SetActive(true);
             }
-        }
-        else
-        {
-            if (_iconActivated)
+            else
             {
-                _iconActivated = false;
-                _collectableIcon.SetActive(false);
+                if (_iconActivated)
+                {
+                    _iconActivated = false;
+                    _collectableIcon.SetActive(false);
+                }
             }
         }
     }
@@ -59,6 +59,11 @@ public class Collectable : MonoBehaviour
     public void ChangeAmount(int dAmount)
     {
         _amount += dAmount;
+    }
+
+    public void DestroyItself()
+    {
+        Destroy(this.gameObject);
     }
 
 }

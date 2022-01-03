@@ -197,7 +197,7 @@ GameObject:
   - component: {fileID: 31197619}
   - component: {fileID: 31197618}
   - component: {fileID: 31197620}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -274,6 +274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &40228901
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,6 +431,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -696,7 +705,7 @@ GameObject:
   - component: {fileID: 94628806}
   - component: {fileID: 94628805}
   - component: {fileID: 94628807}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -773,6 +782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 1
 --- !u!1 &96680831
 GameObject:
   m_ObjectHideFlags: 0
@@ -785,7 +795,7 @@ GameObject:
   - component: {fileID: 96680834}
   - component: {fileID: 96680833}
   - component: {fileID: 96680835}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -862,6 +872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &97033687
 GameObject:
   m_ObjectHideFlags: 0
@@ -1712,6 +1723,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &250432691
@@ -2056,13 +2075,16 @@ GameObject:
   - component: {fileID: 303345182}
   - component: {fileID: 303345184}
   - component: {fileID: 303345183}
-  m_Layer: 11
+  - component: {fileID: 303345187}
+  - component: {fileID: 303345186}
+  - component: {fileID: 303345185}
+  m_Layer: 5
   m_Name: ItemContextMenu
   m_TagString: ItemContextMenu
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &303345182
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2078,13 +2100,13 @@ RectTransform:
   - {fileID: 1400383614}
   - {fileID: 2043961177}
   m_Father: {fileID: 794030581}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -330, y: 212.09985}
+  m_AnchoredPosition: {x: -309, y: 202.09985}
   m_SizeDelta: {x: 30, y: 50}
-  m_Pivot: {x: -0.7, y: 1.2}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &303345183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2123,6 +2145,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 303345181}
   m_CullTransparentMesh: 0
+--- !u!114 &303345185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303345181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!223 &303345186
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303345181}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 2
+  m_TargetDisplay: 0
+--- !u!114 &303345187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 303345181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61eefc7b77e234c4299c8c0d4f0c8b48, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &313739568 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8152972409017736949, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -2223,6 +2295,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1001 &337084064
@@ -2319,6 +2399,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -2451,7 +2539,7 @@ GameObject:
   - component: {fileID: 362423599}
   - component: {fileID: 362423598}
   - component: {fileID: 362423600}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2528,6 +2616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 1
 --- !u!1 &374348877
 GameObject:
   m_ObjectHideFlags: 0
@@ -2738,6 +2827,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -2966,7 +3063,7 @@ GameObject:
   - component: {fileID: 401048038}
   - component: {fileID: 401048037}
   - component: {fileID: 401048039}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3043,6 +3140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &410361221
 GameObject:
   m_ObjectHideFlags: 0
@@ -3168,6 +3266,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -3380,6 +3486,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -4062,6 +4176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 741647c3e7b45914b85e18cb6cbdf9f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _contextMenu: {fileID: 303345187}
   _inventorySlotsHolder: {fileID: 1883539927}
   _inventoryQuickSlotsHolder: {fileID: 938836353}
 --- !u!1 &563135665
@@ -4076,7 +4191,7 @@ GameObject:
   - component: {fileID: 563135668}
   - component: {fileID: 563135667}
   - component: {fileID: 563135669}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot14
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4153,6 +4268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &584440187
 GameObject:
   m_ObjectHideFlags: 0
@@ -4246,7 +4362,7 @@ GameObject:
   - component: {fileID: 604140101}
   - component: {fileID: 604140100}
   - component: {fileID: 604140102}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4323,6 +4439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &609399289
 GameObject:
   m_ObjectHideFlags: 0
@@ -4945,7 +5062,7 @@ GameObject:
   - component: {fileID: 706783685}
   - component: {fileID: 706783684}
   - component: {fileID: 706783686}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot13
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5022,6 +5139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &710577673
 GameObject:
   m_ObjectHideFlags: 0
@@ -5454,81 +5572,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
---- !u!1 &789475112
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 789475113}
-  - component: {fileID: 789475116}
-  - component: {fileID: 789475115}
-  m_Layer: 11
-  m_Name: OuterLayer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &789475113
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 789475112}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 794030581}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &789475115
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 789475112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &789475116
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 789475112}
-  m_CullTransparentMesh: 1
 --- !u!1 &794030580
 GameObject:
   m_ObjectHideFlags: 0
@@ -5540,7 +5583,7 @@ GameObject:
   - component: {fileID: 794030581}
   - component: {fileID: 794030584}
   - component: {fileID: 794030583}
-  m_Layer: 11
+  m_Layer: 2
   m_Name: Inventory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5558,7 +5601,6 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 789475113}
   - {fileID: 938836353}
   - {fileID: 1883539927}
   - {fileID: 303345182}
@@ -5809,7 +5851,7 @@ GameObject:
   - component: {fileID: 827099823}
   - component: {fileID: 827099822}
   - component: {fileID: 827099824}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5886,6 +5928,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!4 &828639409
 Transform:
   m_ObjectHideFlags: 0
@@ -6027,6 +6070,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -6388,7 +6439,7 @@ GameObject:
   - component: {fileID: 904379187}
   - component: {fileID: 904379186}
   - component: {fileID: 904379188}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6465,6 +6516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &922303028
 GameObject:
   m_ObjectHideFlags: 0
@@ -6703,6 +6755,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &937581352
@@ -6717,7 +6777,7 @@ GameObject:
   - component: {fileID: 937581355}
   - component: {fileID: 937581354}
   - component: {fileID: 937581356}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6794,6 +6854,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 1
 --- !u!1 &938836352
 GameObject:
   m_ObjectHideFlags: 0
@@ -6804,7 +6865,7 @@ GameObject:
   m_Component:
   - component: {fileID: 938836353}
   - component: {fileID: 938836354}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: QuickSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6828,7 +6889,7 @@ RectTransform:
   - {fileID: 94628804}
   - {fileID: 937581353}
   m_Father: {fileID: 794030581}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -7019,7 +7080,7 @@ GameObject:
   - component: {fileID: 980548506}
   - component: {fileID: 980548505}
   - component: {fileID: 980548507}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot18
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7096,6 +7157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &989075258
 GameObject:
   m_ObjectHideFlags: 0
@@ -7801,6 +7863,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &1100013666
@@ -7815,7 +7885,7 @@ GameObject:
   - component: {fileID: 1100013669}
   - component: {fileID: 1100013668}
   - component: {fileID: 1100013670}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7892,6 +7962,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 1
 --- !u!1 &1103358739
 GameObject:
   m_ObjectHideFlags: 0
@@ -7904,7 +7975,7 @@ GameObject:
   - component: {fileID: 1103358742}
   - component: {fileID: 1103358741}
   - component: {fileID: 1103358743}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7981,6 +8052,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1105673199
 GameObject:
   m_ObjectHideFlags: 0
@@ -8137,6 +8209,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &1112757290
@@ -8263,7 +8343,7 @@ GameObject:
   - component: {fileID: 1129949653}
   - component: {fileID: 1129949652}
   - component: {fileID: 1129949654}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8340,6 +8420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1133322383
 GameObject:
   m_ObjectHideFlags: 0
@@ -8464,7 +8545,7 @@ GameObject:
   - component: {fileID: 1161363925}
   - component: {fileID: 1161363924}
   - component: {fileID: 1161363926}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8541,6 +8622,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1167089970
 GameObject:
   m_ObjectHideFlags: 0
@@ -8782,7 +8864,7 @@ GameObject:
   - component: {fileID: 1191826468}
   - component: {fileID: 1191826467}
   - component: {fileID: 1191826469}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8859,6 +8941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1192198373
 GameObject:
   m_ObjectHideFlags: 0
@@ -9344,6 +9427,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &1224052202
@@ -9510,6 +9601,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -9789,7 +9888,7 @@ GameObject:
   - component: {fileID: 1299147212}
   - component: {fileID: 1299147211}
   - component: {fileID: 1299147213}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot19
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9866,6 +9965,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1314796697
 GameObject:
   m_ObjectHideFlags: 0
@@ -10014,7 +10114,7 @@ GameObject:
   - component: {fileID: 1342037721}
   - component: {fileID: 1342037720}
   - component: {fileID: 1342037722}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10091,6 +10191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1353119571
 GameObject:
   m_ObjectHideFlags: 0
@@ -10220,7 +10321,7 @@ GameObject:
   - component: {fileID: 1400383617}
   - component: {fileID: 1400383616}
   - component: {fileID: 1400383615}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: About
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10376,7 +10477,7 @@ GameObject:
   - component: {fileID: 1407462516}
   - component: {fileID: 1407462515}
   - component: {fileID: 1407462517}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot15
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10453,6 +10554,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1419240681
 GameObject:
   m_ObjectHideFlags: 0
@@ -10628,6 +10730,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -11043,7 +11153,7 @@ GameObject:
   - component: {fileID: 1484575059}
   - component: {fileID: 1484575058}
   - component: {fileID: 1484575057}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Use
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11254,6 +11364,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &1490607625
@@ -11382,6 +11500,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!224 &1508422455 stripped
@@ -11485,8 +11611,16 @@ PrefabInstance:
       value: Image
       objectReference: {fileID: 0}
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -11765,6 +11899,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &1572346313
@@ -11779,7 +11921,7 @@ GameObject:
   - component: {fileID: 1572346316}
   - component: {fileID: 1572346315}
   - component: {fileID: 1572346317}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot16
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11856,6 +11998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1613284719
 GameObject:
   m_ObjectHideFlags: 0
@@ -12206,6 +12349,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &1659406004
@@ -12424,7 +12575,7 @@ GameObject:
   - component: {fileID: 1688591988}
   - component: {fileID: 1688591987}
   - component: {fileID: 1688591989}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12501,6 +12652,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 1
 --- !u!1001 &1708806222
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12595,6 +12747,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -12692,6 +12852,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -13016,7 +13184,7 @@ GameObject:
   - component: {fileID: 1807277392}
   - component: {fileID: 1807277391}
   - component: {fileID: 1807277390}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: PlayerCanvas
   m_TagString: Canvas
   m_Icon: {fileID: 0}
@@ -13199,7 +13367,7 @@ GameObject:
   - component: {fileID: 1854883501}
   - component: {fileID: 1854883500}
   - component: {fileID: 1854883502}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13276,6 +13444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1860716852
 GameObject:
   m_ObjectHideFlags: 0
@@ -13527,7 +13696,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1883539927}
   - component: {fileID: 1883539928}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Inventory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13566,7 +13735,7 @@ RectTransform:
   - {fileID: 980548504}
   - {fileID: 1299147210}
   m_Father: {fileID: 794030581}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -13847,7 +14016,7 @@ GameObject:
   - component: {fileID: 1958227786}
   - component: {fileID: 1958227785}
   - component: {fileID: 1958227787}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot17
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13924,6 +14093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &1962100162
 GameObject:
   m_ObjectHideFlags: 0
@@ -14054,6 +14224,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -14316,7 +14494,7 @@ GameObject:
   - component: {fileID: 2043961180}
   - component: {fileID: 2043961179}
   - component: {fileID: 2043961178}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Drop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14528,6 +14706,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Image
       objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
 --- !u!1 &2053689676
@@ -14655,6 +14841,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
@@ -14855,7 +15049,7 @@ GameObject:
   - component: {fileID: 2108901973}
   - component: {fileID: 2108901972}
   - component: {fileID: 2108901974}
-  m_Layer: 11
+  m_Layer: 5
   m_Name: Slot7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14932,6 +15126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72440afa35f1ac6438a2bc7dd7c5d867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _quickSlot: 0
 --- !u!1 &2129772486
 GameObject:
   m_ObjectHideFlags: 0
@@ -15154,6 +15349,14 @@ PrefabInstance:
     - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
       propertyPath: m_Name
       value: Image
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409017736950, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8152972409272838880, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dc410a42f70d904db17d919d4f84800, type: 3}
