@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class InventoryContextMenu : MonoBehaviour
 {
     private PlayerInventory _playerInventory;
+    private InventorySlot _activeSlot;
     private bool _activated;
 
     private void Awake()
@@ -29,16 +30,20 @@ public class InventoryContextMenu : MonoBehaviour
         Transform desiredSlotHolder = quickSlot ? _playerInventory.InventoryQuickSlotsHolder : _playerInventory.InventorySlotsHolder;
         RectTransform desiredSlot = null;
         for (int i = 0; i < desiredSlotHolder.childCount; i++)
-            if (desiredSlotHolder.GetChild(i).GetComponent<InventorySlot>().ID == slotID) desiredSlot = desiredSlotHolder.GetChild(i).GetComponent<RectTransform>();
+        {
+            if (desiredSlotHolder.GetChild(i).GetComponent<InventorySlot>().ID == slotID)
+            {
+                _activeSlot = desiredSlotHolder.GetChild(i).GetComponent<InventorySlot>();
+                desiredSlot = _activeSlot.GetComponent<RectTransform>();
+            }
+        }
 
         if (desiredSlot == null)
         {
             Debug.Log("YO DUMDUM NO DESIRED SLOT FOUND");
             return;
         }
-
-        InventorySlot slot = desiredSlot.GetComponent<InventorySlot>();
-        if (slot.Free == false)
+        if (_activeSlot.Free == false)
         {
             this.GetComponent<Image>().enabled = true;
             this.GetComponent<Canvas>().enabled = true;
@@ -50,7 +55,7 @@ public class InventoryContextMenu : MonoBehaviour
             this.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, 0.0f);
             this.GetComponent<RectTransform>().SetParent(desiredSlotHolder.parent);
 
-            ItemType itemType = slot.CurrentItem.GetItemType();
+            ItemType itemType = _activeSlot.CurrentItem.GetItemType();
             switch(itemType)
             {
                 case ItemType.FOOD:
@@ -85,15 +90,22 @@ public class InventoryContextMenu : MonoBehaviour
     public void UseOREquipAction()
     {
         Debug.Log("USEOREQUIP");
+        Deactivate();
     }
 
     public void AboutAction()
     {
         Debug.Log("ABOUT");
+        Deactivate();
     }
 
     public void DropAction()
     {
         Debug.Log("DROP");
+        if (!_activeSlot.Free)
+        {
+            _playerInventory.DropItem(_activeSlot.CurrentItem);
+        }
+        Deactivate();
     }
 }

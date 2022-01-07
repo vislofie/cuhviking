@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Collectable : MonoBehaviour
 {
-    private enum ITEM_IDS { Axe = 0 }
+    private enum ITEM_IDS { Axe = 0, Sword = 1 }
     public int ItemID { get { return (int)_itemID; } }
 
     [SerializeField]

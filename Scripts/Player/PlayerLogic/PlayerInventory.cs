@@ -240,6 +240,52 @@ public class PlayerInventory : MonoBehaviour
     }
 
     /// <summary>
+    /// Drops a GameObject of the given Item and removes it from the inventory if needed
+    /// </summary>
+    /// <param name="item">item to drop</param>
+    /// <param name="amount">amount of item to drop, equals to -1 if its required to drop all of it</param>
+    public void DropItem(Item item, int amount = -1)
+    {
+        if (_inventoryItems.Contains(item))
+        {
+            int itemIDInList = -1;
+            for (int i = 0; i < _inventoryItems.Count; i++)
+                if (_inventoryItems[i].Equals(item))
+                    itemIDInList = i;
+
+            bool quickSlot = item.QuickSlot;
+            int slotID = item.Slot;
+            int itemID = item.ID;
+
+            InventorySlot slot = quickSlot ? _inventoryQuickSlotTransforms[slotID].GetComponent<InventorySlot>() : _inventorySlotTransforms[slotID].GetComponent<InventorySlot>();
+
+            
+            
+            if (amount != -1)
+            {
+                for (int i = 0; i < amount; i++)
+                {
+                    GameObject collectable = Instantiate(_itemPrefabs[itemID]);
+                    collectable.transform.position = transform.position;
+                }
+                item.ChangeAmount(-amount);
+                if (item.Amount <= 0)
+                {
+                    _inventoryItems.Remove(item);
+                    slot.Emptify();
+                }
+            }
+            else
+            {
+                GameObject collectable = Instantiate(_itemPrefabs[itemID]);
+                collectable.transform.position = transform.position;
+                slot.Emptify();
+                _inventoryItems.Remove(item);
+            }
+        }
+    }
+
+    /// <summary>
     /// Updates visual info of the inventory
     /// </summary>
     private void UpdateVisualInfo()
@@ -261,7 +307,6 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-
     /// <summary>
     /// Swaps two existent items in the inventory
     /// </summary>
@@ -279,8 +324,13 @@ public class PlayerInventory : MonoBehaviour
                 else if (_inventoryItems[i] == secondItem) secondInventoryID = i;
             }
             int firstSlotID = _inventoryItems[firstInventoryID].Slot;
+            bool firstQuickSlot = _inventoryItems[firstInventoryID].QuickSlot;
+
             _inventoryItems[firstInventoryID].ChangeSlotID(_inventoryItems[secondInventoryID].Slot);
             _inventoryItems[secondInventoryID].ChangeSlotID(firstSlotID);
+
+            _inventoryItems[firstInventoryID].ChangeQuickSlot(_inventoryItems[secondInventoryID].QuickSlot);
+            _inventoryItems[secondInventoryID].ChangeQuickSlot(firstQuickSlot);
             UpdateVisualInfo();
         }
     }
@@ -381,6 +431,8 @@ public class PlayerInventory : MonoBehaviour
         switch(itemID)
         {
             case 0: // AXE
+                return 1;
+            case 1: // SWORD
                 return 1;
             default:
                 return -1;
