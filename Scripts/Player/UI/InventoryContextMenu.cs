@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class InventoryContextMenu : MonoBehaviour
 {
     private PlayerInventory _playerInventory;
+    public InventorySlot ActiveSlot { get { return _activeSlot; } }
     private InventorySlot _activeSlot;
     private bool _activated;
 

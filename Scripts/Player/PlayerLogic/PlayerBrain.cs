@@ -125,6 +125,11 @@ public class PlayerBrain : MonoBehaviour
                 _eventHandler.CallHearers();
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            _inventory.SwitchInventorySlots();
+        }
     }
 
     private void FixedUpdate()

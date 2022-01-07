@@ -84,6 +84,9 @@ public class PlayerInventory : MonoBehaviour
     public bool MouseInInventory { get { return _mouseInInventory; } }
     private bool _mouseInInventory;
 
+    public bool Activated { get { return _activated; } }
+    private bool _activated;
+
     public Transform InventorySlotsHolder { get { return _inventorySlotsHolder; } }
     public Transform InventoryQuickSlotsHolder { get { return _inventoryQuickSlotsHolder; } }
 
@@ -131,7 +134,8 @@ public class PlayerInventory : MonoBehaviour
 
     private void Start()
     {
-        AddItem(0, 1);
+        _activated = true;
+        SwitchInventorySlots();
     }
 
     private void Update()
@@ -146,6 +150,20 @@ public class PlayerInventory : MonoBehaviour
         }
 
         _mouseInInventory = CheckIfCursorInsideInventory();
+    }
+
+    public void SwitchInventorySlots()
+    {
+        for (int i = 0; i < _inventorySlotTransforms.Length; i++)
+        {
+            _inventorySlotTransforms[i].gameObject.SetActive(!_activated);
+        }
+
+        if (_activated && _contextMenu.ActiveSlot != null)
+            if (!_contextMenu.ActiveSlot.QuickSlot)
+                _contextMenu.Deactivate();
+
+        _activated = !_activated;
     }
 
     /// <summary>
@@ -314,7 +332,7 @@ public class PlayerInventory : MonoBehaviour
     /// <param name="secondItem"></param>
     public void SwapItems(Item firstItem, Item secondItem)
     {
-        if (_inventoryItems.Contains(firstItem) && _inventoryItems.Contains(secondItem))
+        if (_inventoryItems.Contains(firstItem) && _inventoryItems.Contains(secondItem) && !firstItem.Equals(secondItem))
         {
             int firstInventoryID = -1;
             int secondInventoryID = -1;

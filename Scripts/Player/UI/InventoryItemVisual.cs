@@ -52,9 +52,6 @@ public class InventoryItemVisual : MonoBehaviour, IBeginDragHandler, IDragHandle
             _canvasGroup.alpha = 0.6f;
             _canvasGroup.blocksRaycasts = false;
         }
-        Debug.Log("OnBeginDrag");
-        
-
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -63,7 +60,6 @@ public class InventoryItemVisual : MonoBehaviour, IBeginDragHandler, IDragHandle
         {
             _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
         }
-        Debug.Log("OnDrag");
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -73,8 +69,6 @@ public class InventoryItemVisual : MonoBehaviour, IBeginDragHandler, IDragHandle
             _canvasGroup.alpha = 1.0f;
             _canvasGroup.blocksRaycasts = true;
         }
-        Debug.Log("OnEndDrag");
-        
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -83,6 +77,5 @@ public class InventoryItemVisual : MonoBehaviour, IBeginDragHandler, IDragHandle
         {
             _playerInventory.CallContextMenu(_slot.ID, _slot.QuickSlot);
         }
-        Debug.Log("OnPointerDown");
     }
 }
