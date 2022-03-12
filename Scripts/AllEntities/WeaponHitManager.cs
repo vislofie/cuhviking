@@ -48,6 +48,7 @@ public class WeaponHitManager : MonoBehaviour
             {
                 if (collider.CompareTag("Player"))
                 {
+                    Debug.Log("Sent damage");
                     _combatController.ReceiveHitSignal(collider.gameObject.GetComponent<EntityCombat>());
                 }
             }

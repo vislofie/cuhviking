@@ -3,7 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-
+/// <summary>
+/// Weapon Damages
+/// </summary>
+public enum WeaponDamages
+{
+    STICK = 20,
+    HEAD = 10
+};
 public class EntityCombat : MonoBehaviour
 {
     [Tooltip("tells either this combat system belongs to player or nah")]
@@ -15,8 +22,8 @@ public class EntityCombat : MonoBehaviour
 
     private void Awake()
     {
-        if (_playersCombat) _playerBrain = this.GetComponent<PlayerBrain>();
-        else                _enemyBrain = this.GetComponent<EnemyBrain>();
+        if (_playersCombat) _playerBrain = GetComponent<PlayerBrain>();
+        else                _enemyBrain = GetComponent<EnemyBrain>();
     }
 
     /// <summary>
@@ -47,8 +54,9 @@ public class EntityCombat : MonoBehaviour
     /// <param name="combatController">EntityCombat that got hit</param>
     public void ReceiveHitSignal(EntityCombat combatController)
     {
+        Debug.Log("RECEIVED HIT SIGNAL");
         if (_playersCombat) _playerBrain.SendDamageToEnemy(combatController);
-        //else _enemyBrain.SendDamageToEntity(combatController);
+        else _enemyBrain.SendDamageToEntity(combatController);
     }
 
     

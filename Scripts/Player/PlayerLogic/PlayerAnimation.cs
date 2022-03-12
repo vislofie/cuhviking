@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AnimatorStates
+public enum PAnimatorStates
 {
     QuickHit, CancelLong, StartLong, ProceedLong, Block, Unblock,
     Crouch, Walk, Run
@@ -15,17 +15,17 @@ public class PlayerAnimation : MonoBehaviour
     private PlayerBrain _brain;
 
     [SerializeField]
-    private Dictionary<AnimatorStates, bool> _triggersState = new Dictionary<AnimatorStates, bool>(); // if animation is allowed to be played the value of a key is true, if not then it is false
+    private Dictionary<PAnimatorStates, bool> _triggersState = new Dictionary<PAnimatorStates, bool>(); // if animation is allowed to be played the value of a key is true, if not then it is false
 
     private Animator _animator;
 
     private void Awake()
     {
         for (int i = 0; i < ANIMATOR_STATES_COUNT; i++)
-            _triggersState.Add((AnimatorStates)i, true);
+            _triggersState.Add((PAnimatorStates)i, true);
 
-        _animator = this.gameObject.GetComponent<Animator>();
-        _brain = this.gameObject.GetComponent<PlayerBrain>();
+        _animator = GetComponent<Animator>();
+        _brain = GetComponent<PlayerBrain>();
     }
 
     private void ResetTriggers()
@@ -37,45 +37,45 @@ public class PlayerAnimation : MonoBehaviour
         _animator.ResetTrigger("Block");
     }
 
-    public void ActivateTrigger(AnimatorStates trigger)
+    public void ActivateTrigger(PAnimatorStates trigger)
     {
         if (_triggersState[trigger] == true)
         {
             switch (trigger)
             {
-                case AnimatorStates.Block:
+                case PAnimatorStates.Block:
                     _animator.SetTrigger("Block");
                     _triggersState[trigger] = false;
                     _brain.ChangeStamina(PlayerBrain.S_PUNISH_BLOCK);
                     break;
-                case AnimatorStates.CancelLong:
+                case PAnimatorStates.CancelLong:
                     _animator.SetTrigger("CancelLong");
                     break;
-                case AnimatorStates.ProceedLong:
+                case PAnimatorStates.ProceedLong:
                     _animator.SetTrigger("ProceedLong");
                     _triggersState[trigger] = false;
                     _brain.ChangeStamina(PlayerBrain.S_PUNISH_LONG_HIT_FINISHED);
                     break;
-                case AnimatorStates.QuickHit:
+                case PAnimatorStates.QuickHit:
                     _animator.SetTrigger("QuickHit");
                     _triggersState[trigger] = false;
                     _brain.ChangeStamina(PlayerBrain.S_PUNISH_QUICK_HIT);
                     break;
-                case AnimatorStates.StartLong:
+                case PAnimatorStates.StartLong:
                     _animator.SetTrigger("StartLong");
                     _triggersState[trigger] = false;
                     _brain.ChangeStamina(PlayerBrain.S_PUNISH_LONG_HIT_N_FINISHED);
                     break;
-                case AnimatorStates.Unblock:
+                case PAnimatorStates.Unblock:
                     _animator.SetTrigger("Unblock");
                     break;
-                case AnimatorStates.Crouch:
+                case PAnimatorStates.Crouch:
                     // TODO: add crouch triggering animation
                     break;
-                case AnimatorStates.Walk:
+                case PAnimatorStates.Walk:
                     // TODO: add walk triggering animation
                     break;
-                case AnimatorStates.Run:
+                case PAnimatorStates.Run:
                     // TODO: add run triggering animation
                     break;
                 default:
@@ -89,28 +89,28 @@ public class PlayerAnimation : MonoBehaviour
         }
     }
 
-    public void OnAnimationEnd(AnimatorStates trigger)
+    public void OnAnimationEnd(PAnimatorStates trigger)
     {
         switch (trigger)
         {
-            case AnimatorStates.Block:
+            case PAnimatorStates.Block:
                 break;
-            case AnimatorStates.CancelLong:
+            case PAnimatorStates.CancelLong:
                 break;
-            case AnimatorStates.ProceedLong:
+            case PAnimatorStates.ProceedLong:
                 _triggersState[trigger] = true;
-                _triggersState[AnimatorStates.StartLong] = true;
+                _triggersState[PAnimatorStates.StartLong] = true;
                 break;
-            case AnimatorStates.QuickHit:
-                _triggersState[trigger] = true;
-                break;
-            case AnimatorStates.StartLong:
+            case PAnimatorStates.QuickHit:
                 _triggersState[trigger] = true;
                 break;
-            case AnimatorStates.Unblock:
+            case PAnimatorStates.StartLong:
+                _triggersState[trigger] = true;
+                break;
+            case PAnimatorStates.Unblock:
                 for (int i = 0; i < ANIMATOR_STATES_COUNT; i++)
                 {
-                    _triggersState[(AnimatorStates)i] = true;
+                    _triggersState[(PAnimatorStates)i] = true;
 
                     ResetTriggers();
                 }

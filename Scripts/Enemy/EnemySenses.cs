@@ -73,7 +73,7 @@ public class EnemySenses : MonoBehaviour
 
     private void Awake()
     {
-        _brain = this.GetComponent<EnemyBrain>();
+        _brain = GetComponent<EnemyBrain>();
         _hearTrigger.radius = _normalHearRadius;
     }
 

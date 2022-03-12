@@ -47,8 +47,8 @@ public class InventoryContextMenu : MonoBehaviour
         if (_activeSlot.Free == false)
         {
             this.GetComponent<Image>().enabled = true;
-            this.GetComponent<Canvas>().enabled = true;
-            this.GetComponent<GraphicRaycaster>().enabled = true;
+            GetComponent<Canvas>().enabled = true;
+            GetComponent<GraphicRaycaster>().enabled = true;
             for (int i = 0; i < this.transform.childCount; i++)
                 this.transform.GetChild(i).gameObject.SetActive(true);
 

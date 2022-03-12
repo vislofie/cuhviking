@@ -13,8 +13,8 @@ public class EnemyMovement : MonoBehaviour
 
     private void Awake()
     {
-        _agent = this.GetComponent<NavMeshAgent>();
-        _rigidbody = this.GetComponent<Rigidbody>();
+        _agent = GetComponent<NavMeshAgent>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     /// <summary>

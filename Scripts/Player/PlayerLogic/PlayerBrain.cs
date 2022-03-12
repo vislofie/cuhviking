@@ -2,12 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponDamages
-{
-    STICK = 20
-};
-
-// state of movement of this player
 public enum MovementState
 {
     Crouching, Walking, Running
@@ -70,17 +64,17 @@ public class PlayerBrain : MonoBehaviour
     #region BASIC-FUNCTIONS SECTION
     private void Awake()
     {
-        _chars = this.GetComponent<PlayerChars>();
-        _eventHandler = this.GetComponent<EntityEventHandler>();
-        _movementController = this.GetComponent<PlayerMovement>();
-        _animationController = this.GetComponent<PlayerAnimation>();
-        _combatController = this.GetComponent<EntityCombat>();
-        _UI = this.GetComponent<PlayerUI>();
-        _FOV = this.GetComponent<PlayerFOV>();
-        _inventory = this.GetComponent<PlayerInventory>();
+        _chars = GetComponent<PlayerChars>();
+        _eventHandler = GetComponent<EntityEventHandler>();
+        _movementController = GetComponent<PlayerMovement>();
+        _animationController = GetComponent<PlayerAnimation>();
+        _combatController = GetComponent<EntityCombat>();
+        _UI = GetComponent<PlayerUI>();
+        _FOV = GetComponent<PlayerFOV>();
+        _inventory = GetComponent<PlayerInventory>();
 
-        _rigidbody = this.GetComponent<Rigidbody>();
-        _playerCollider = this.GetComponent<Collider>();
+        _rigidbody = GetComponent<Rigidbody>();
+        _playerCollider = GetComponent<Collider>();
 
         _isAllowedToMove = true;
         _isAllowedToAttack = true;
@@ -359,12 +353,12 @@ public class PlayerBrain : MonoBehaviour
 
         if (quickHit && _chars.Stamina >= -S_PUNISH_QUICK_HIT)
         {
-            _animationController.ActivateTrigger(AnimatorStates.QuickHit);
+            _animationController.ActivateTrigger(PAnimatorStates.QuickHit);
             _chars.DisableStaminaRegen(_afterActionDelayTime);
         }
         else if (longHit && _chars.Stamina >= -S_PUNISH_LONG_HIT_N_FINISHED)
         {
-            _animationController.ActivateTrigger(AnimatorStates.StartLong);
+            _animationController.ActivateTrigger(PAnimatorStates.StartLong);
             _chars.DisableStaminaRegen(_afterActionDelayTime);
         }
         else if (_longHitLastFrame && !longHit)
@@ -372,22 +366,22 @@ public class PlayerBrain : MonoBehaviour
             if (_longHitReady)
             {
                 if (_chars.Stamina >= -S_PUNISH_LONG_HIT_FINISHED)
-                    _animationController.ActivateTrigger(AnimatorStates.ProceedLong);
+                    _animationController.ActivateTrigger(PAnimatorStates.ProceedLong);
                 else
-                    _animationController.ActivateTrigger(AnimatorStates.CancelLong);
+                    _animationController.ActivateTrigger(PAnimatorStates.CancelLong);
 
                 _chars.DisableStaminaRegen(_afterActionDelayTime);
             }
             else
             {
-                _animationController.ActivateTrigger(AnimatorStates.CancelLong);
+                _animationController.ActivateTrigger(PAnimatorStates.CancelLong);
             }
             _longHitReady = false;
         }
 
         if (block && _chars.Stamina >= S_PUNISH_BLOCK)
         {
-            _animationController.ActivateTrigger(AnimatorStates.Block);
+            _animationController.ActivateTrigger(PAnimatorStates.Block);
             _chars.DisableStaminaRegen(_afterActionDelayTime);
         }
 
