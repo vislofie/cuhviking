@@ -35,7 +35,9 @@ public class EntityCharacteristics : MonoBehaviour
     [SerializeField]
     private int _normalStaminaRegenValue = 1;
     [SerializeField]
-    private float _staminaRegenStepTime = 0.1f;
+    private float _staminaRegenStepTime = 1.0f;
+    [SerializeField]
+    private float _staminaDecreaseStepTime = 0.1f;
 
     public float AfterActionDelayTime { get { return _afterActionDelayTime; } }
     [Tooltip("Time it takes to restore health or stamina regen after some action")]
@@ -200,7 +202,7 @@ public class EntityCharacteristics : MonoBehaviour
     public void EnableStaminaGraduateChange(float value, float timeToDisable, bool disableRegularRegen)
     {
         if (_graduateStaminaChanger != null) StopCoroutine(_graduateStaminaChanger);
-        _graduateStaminaChanger = GraduateChanger(value, _staminaRegenStepTime, false);
+        _graduateStaminaChanger = GraduateChanger(value, _staminaDecreaseStepTime, false);
         StartCoroutine(_graduateStaminaChanger);
 
         if (_graduateStaminaChangerDisabler != null) StopCoroutine(_graduateStaminaChangerDisabler);
@@ -218,7 +220,7 @@ public class EntityCharacteristics : MonoBehaviour
     public void EnableStaminaGraduateChange(float value, bool disableRegularRegen)
     {
         if (_graduateStaminaChanger != null) StopCoroutine(_graduateStaminaChanger);
-        _graduateStaminaChanger = GraduateChanger(value, _staminaRegenStepTime, false);
+        _graduateStaminaChanger = GraduateChanger(value, _staminaDecreaseStepTime, false);
         StartCoroutine(_graduateStaminaChanger);
 
         if (_graduateStaminaChangerDisabler != null) StopCoroutine(_graduateStaminaChangerDisabler);
@@ -240,7 +242,7 @@ public class EntityCharacteristics : MonoBehaviour
     /// <param name="value">value that is going to change per step</param>
     /// <param name="stepTime">time it takes to make one step</param>
     /// <param name="health">if true, increases health else increases stamina</param>
-    private IEnumerator GraduateChanger(float value, float stepTime, bool health)
+    protected IEnumerator GraduateChanger(float value, float stepTime, bool health)
     {
         while (true)
         {
@@ -255,20 +257,26 @@ public class EntityCharacteristics : MonoBehaviour
     /// </summary>
     /// <param name="increaser">GraduateChanger to turn on</param>
     /// <param name="timeToEnable">Time it takes to enable the increaser</param>
-    private IEnumerator RestoreIncreaser(IEnumerator increaser, float timeToEnable)
+    protected IEnumerator RestoreIncreaser(IEnumerator increaser, float timeToEnable)
     {
         yield return new WaitForSeconds(timeToEnable);
         StartCoroutine(increaser);
     }
 
-    private IEnumerator GraduateChangerDisabler(IEnumerator changer, float timeToDisable)
+    /// <summary>
+    /// Disables GraduateChanger by given IEnumerator in given time
+    /// </summary>
+    /// <param name="changer"></param>
+    /// <param name="timeToDisable"></param>
+    /// <returns></returns>
+    protected IEnumerator GraduateChangerDisabler(IEnumerator changer, float timeToDisable)
     {
         yield return new WaitForSeconds(timeToDisable);
         if (changer != null) StopCoroutine(changer);
     }
     #endregion
 
-    #region INHERITED EVENTS
+    #region INHERITABLE EVENTS
     public virtual void OnHealthChange(float healthDelta)
     {
         // idk what to write here tbh

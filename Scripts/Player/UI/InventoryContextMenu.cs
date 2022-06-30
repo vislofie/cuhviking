@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,9 @@ public class InventoryContextMenu : MonoBehaviour
     public InventorySlot ActiveSlot { get { return _activeSlot; } }
     private InventorySlot _activeSlot;
     private bool _activated;
+
+    private Action<int> _eatDelegate;
+    private Action<int> _liquidDelegate;
 
     private void Awake()
     {
@@ -46,26 +50,30 @@ public class InventoryContextMenu : MonoBehaviour
         }
         if (_activeSlot.Free == false)
         {
-            this.GetComponent<Image>().enabled = true;
+            GetComponent<Image>().enabled = true;
             GetComponent<Canvas>().enabled = true;
             GetComponent<GraphicRaycaster>().enabled = true;
             for (int i = 0; i < this.transform.childCount; i++)
                 this.transform.GetChild(i).gameObject.SetActive(true);
 
-            this.GetComponent<RectTransform>().SetParent(desiredSlot);
-            this.GetComponent<RectTransform>().anchoredPosition = new Vector2(0.0f, 0.0f);
-            this.GetComponent<RectTransform>().SetParent(desiredSlotHolder.parent);
+            RectTransform rt = GetComponent<RectTransform>();
+
+            rt.SetParent(desiredSlot);
+            rt.anchoredPosition = new Vector2(0.0f, 0.0f);
+            rt.SetParent(desiredSlotHolder.parent);
 
             ItemType itemType = _activeSlot.CurrentItem.GetItemType();
             switch(itemType)
             {
                 case ItemType.FOOD:
-                case ItemType.WATER:
+                    transform.GetChild(0).GetComponent<Text>().text = "Eat";
+                    break;
+                case ItemType.LIQUID:
                 case ItemType.MEDICINE:
-                    this.transform.GetChild(0).GetComponent<Text>().text = "Use";
+                    transform.GetChild(0).GetComponent<Text>().text = "Use";
                     break;
                 default:
-                    this.transform.GetChild(0).GetComponent<Text>().text = "Equip";
+                    transform.GetChild(0).GetComponent<Text>().text = "Equip";
                     break;
             }
         }
@@ -91,7 +99,51 @@ public class InventoryContextMenu : MonoBehaviour
     public void UseOREquipAction()
     {
         Debug.Log("USEOREQUIP");
+        if (!_activeSlot.Free)
+        {
+            switch (_activeSlot.CurrentItem.Type)
+            {
+                case ItemType.WEAPON:
+                    break;
+                case ItemType.HEAD_ARMOR:
+                    break;
+                case ItemType.CHEST_ARMOR:
+                    break;
+                case ItemType.ARM_ARMOR:
+                    break;
+                case ItemType.LEG_ARMOR:
+                    break;
+                case ItemType.BOOTS:
+                    break;
+                case ItemType.FOOD:
+                    _eatDelegate.Invoke(_activeSlot.CurrentItem.ID);
+                    break;
+                case ItemType.LIQUID:
+                    _liquidDelegate.Invoke(_activeSlot.CurrentItem.ID);
+                    break;
+                case ItemType.MEDICINE:
+                    break;
+                default:
+                    Debug.Log("WRONG ITEM TYPE YOU DUM DUM");
+                    return;
+            }
+        }
+
+        _activeSlot.Emptify();
         Deactivate();
+    }
+
+    private void EatItemByID(int itemID)
+    {
+        switch (itemID)
+        {
+            case 2:
+                
+                break;
+            default:
+                Debug.Log("WRONG ITEM ID YOU MORON");
+                break;
+        }
     }
 
     public void AboutAction()
@@ -108,5 +160,15 @@ public class InventoryContextMenu : MonoBehaviour
             _playerInventory.DropItem(_activeSlot.CurrentItem);
         }
         Deactivate();
+    }
+
+    public void SetFoodDelegate(Action<int> action)
+    {
+        _eatDelegate = action;
+    }
+
+    public void SetLiquidDelegate(Action<int> action)
+    {
+        _liquidDelegate = action;
     }
 }

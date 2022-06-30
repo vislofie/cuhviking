@@ -81,7 +81,7 @@ public class EnemyBrain : MonoBehaviour
     {
         FindVisibleTargetsAndAct();
     }
-#endregion
+    #endregion
 
     /// <summary>
     /// Rotates this enemy at the given angle and within the given time

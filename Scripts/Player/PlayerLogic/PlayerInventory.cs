@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public enum ItemType { WEAPON, HEAD_ARMOR, CHEST_ARMOR, ARM_ARMOR, LEG_ARMOR, BOOTS, FOOD, WATER, MEDICINE };
+public enum ItemID { Axe = 0, Sword = 1, Apple = 2, Ale = 3 }
+public enum ItemType { WEAPON, HEAD_ARMOR, CHEST_ARMOR, ARM_ARMOR, LEG_ARMOR, BOOTS, FOOD, LIQUID, MEDICINE };
 public class Item
 {
     public int ID { get { return id; } }
@@ -136,6 +138,8 @@ public class PlayerInventory : MonoBehaviour
     {
         _activated = true;
         SwitchInventorySlots();
+
+        UpdateVisualInfo();
     }
 
     private void Update()
@@ -150,6 +154,16 @@ public class PlayerInventory : MonoBehaviour
         }
 
         _mouseInInventory = CheckIfCursorInsideInventory();
+    }
+
+    public void PassFoodDelegateToContextMenu(Action<int> action)
+    {
+        _contextMenu.SetFoodDelegate(action);
+    }
+
+    public void PassLiquidDelegateToContextMenu(Action<int> action)
+    {
+        _contextMenu.SetLiquidDelegate(action);
     }
 
     public void SwitchInventorySlots()
@@ -190,11 +204,10 @@ public class PlayerInventory : MonoBehaviour
             if (firstFreeSlot == -1)
             {
                 firstFreeSlot = GetFirstFreeSlotID(true);
-                Debug.Log(firstFreeSlot);
+
                 quickSlot = true;
                 if (firstFreeSlot == -1) // no empty slots at all
                 {
-                    Debug.Log("Inventory is full!!!!!");
                     break;
                 }
             }
@@ -203,6 +216,9 @@ public class PlayerInventory : MonoBehaviour
             {
                 int curInstance = GetNextInstanceNumberOfSameItem(itemID);
                 int amountToAdd = Mathf.Clamp(amount, 1, GetMaxAmountByItemID(itemID));
+
+                if (amountToAdd == -1) break;
+
                 amount -= amountToAdd;
                 Item item = new Item(itemID, firstFreeSlot, quickSlot, curInstance, _sprites[itemID], _sprites[itemID].name.Remove(0, itemID.ToString().Length + 1),
                                         _itemPrefabs[itemID].GetComponent<Collectable>().Type, amountToAdd, GetMaxAmountByItemID(itemID));
@@ -452,7 +468,12 @@ public class PlayerInventory : MonoBehaviour
                 return 1;
             case 1: // SWORD
                 return 1;
+            case 2: // APPLE
+                return 5;
+            case 3: // ALE
+                return 1;
             default:
+                Debug.LogAssertion("WRONG ITEMID IN GetMaxAmountByItemID(int) IN " + GetType().Name);
                 return -1;
         }
     }

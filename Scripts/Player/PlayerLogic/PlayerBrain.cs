@@ -17,7 +17,7 @@ public class PlayerBrain : MonoBehaviour
     public const int S_PUNISH_BLOCK = -15;
     public const int S_PUNISH_QUICK_HIT = -50;
 
-    private EntityCharacteristics _chars;
+    private PlayerChars _chars;
     private EntityEventHandler _eventHandler;
     private PlayerMovement _movementController;
     private PlayerAnimation _animationController;
@@ -58,6 +58,10 @@ public class PlayerBrain : MonoBehaviour
 
     private IEnumerator _delay; // coroutine that allows to create delays
     private bool _delayEnded; // boolean variable responsible for telling whether the delay has finished or nah
+
+    [Header("Inventory")]
+    [SerializeField]
+    private LayerMask _collectablesLayerMask;
 
 
 
@@ -103,6 +107,9 @@ public class PlayerBrain : MonoBehaviour
         _chars.EnableHealthRegen();
         _chars.EnableStaminaRegen();
 
+        _inventory.PassFoodDelegateToContextMenu(OnEatFood);
+        _inventory.PassLiquidDelegateToContextMenu(OnDrinkLiquid);
+
         Walk();
     }
 
@@ -117,12 +124,54 @@ public class PlayerBrain : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.H)) // loud noise
             {
                 _eventHandler.CallHearers();
+                return;
             }
         }
 
         if (Input.GetKeyDown(KeyCode.I))
         {
             _inventory.SwitchInventorySlots();
+            return;
+        }
+
+        if (_currentLadder != null)
+        {
+            if (Input.GetKey(KeyCode.Space) && _delayEnded)
+            {
+                _currentLadder.ClimbUp();
+                _delay = Delay(0.5f);
+                StartCoroutine(_delay);
+            }
+            else if (Input.GetKey(KeyCode.M) && _delayEnded)
+            {
+                _currentLadder.ClimbDown();
+                _delay = Delay(0.5f);
+                StartCoroutine(_delay);
+            }
+
+            return;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, float.PositiveInfinity, _collectablesLayerMask))
+            {
+                Collectable pickedItem = null;
+
+                if (hit.collider.TryGetComponent(out pickedItem))
+                {
+                    if (pickedItem.IconActivated)
+                    {
+                        _inventory.AddItem(pickedItem.ItemID, pickedItem.Amount);
+                        pickedItem.DestroyItself();
+
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -139,22 +188,6 @@ public class PlayerBrain : MonoBehaviour
 
         _FOV.SetAimDirection(_movementController.MousePosition - transform.position);
         _FOV.SetOrigin(transform.position);
-
-        if (_currentLadder != null)
-        {
-            if (Input.GetKey(KeyCode.Space) && _delayEnded)
-            {
-                _currentLadder.ClimbUp();
-                _delay = Delay(0.5f);
-                StartCoroutine(_delay);
-            }
-            else if (Input.GetKey(KeyCode.M) && _delayEnded)
-            {
-                _currentLadder.ClimbDown();
-                _delay = Delay(0.5f);
-                StartCoroutine(_delay);
-            }
-        }
     }
     #endregion
 
@@ -205,6 +238,49 @@ public class PlayerBrain : MonoBehaviour
     public void DisableActiveHitManager(string whoCalled)
     {
         _weaponManagers[_activeWeaponIndex].Disable();
+    }
+    #endregion
+
+    #region CONSUMPTION SECTION
+
+    /// <summary>
+    /// Gets called when player eats food from the inventory
+    /// </summary>
+    /// <param name="value">amount of hunger to add(welp reduce actually but yknow we use the opposite of hunger as the value in the bar)</param>
+    private void OnEatFood(int foodID)
+    {
+        switch (foodID)
+        {
+            case 2:
+                _chars.Hunger += 2.0f;
+                break;
+            default:
+                Debug.LogWarning("WRONG FOOD ID ON OnEatFood(int) IN " + GetType().Name);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Gets called when player drinks some liquid from the inventory
+    /// </summary>
+    /// <param name="value"></param>
+    private void OnDrinkLiquid(int liquidID)
+    {
+        switch (liquidID)
+        {
+            case (int)ItemID.Ale:
+                _chars.Thirst += 3.0f;
+                _chars.Hunger += 0.5f;
+
+                _chars.ChangeHealth(-5.0f);
+                _chars.ChangeStamina(-10.0f);
+                _chars.DisableHealthRegen(_afterActionDelayTime);
+                _chars.DisableStaminaRegen(_afterActionDelayTime);
+                break;
+            default:
+                Debug.LogWarning("WRONG LIQUID ID ON OnDrinkLiquid(int) IN " + GetType().Name);
+                break;
+        }
     }
     #endregion
 
@@ -314,6 +390,16 @@ public class PlayerBrain : MonoBehaviour
     {
         _UI.UpdateStaminaStatus(_chars.Stamina, _chars.MaxStamina);
     }
+
+    public void UpdateHungerInUI()
+    {
+        _UI.UpdateHungerStatus(_chars.Hunger, _chars.MaxHunger);
+    }
+
+    public void UpdateThirstInUI()
+    {
+        _UI.UpdateThirstStatus(_chars.Thirst, _chars.MaxThirst);
+    }
     #endregion
 
     #region ANIMATION SECTION
@@ -403,13 +489,6 @@ public class PlayerBrain : MonoBehaviour
                 _playerCollider.enabled = false;
 
                 _movementController.LookAt(other.transform.parent.GetChild(other.transform.parent.childCount - 1).position);
-            }
-            if (other.gameObject.CompareTag("CollectableIcon") && Input.GetKeyDown(KeyCode.E))
-            {
-                Collectable pickedItem = other.transform.parent.gameObject.GetComponent<Collectable>();
-                _inventory.AddItem(pickedItem.ItemID, pickedItem.Amount);
-                pickedItem.DestroyItself();
-
             }
         }
         

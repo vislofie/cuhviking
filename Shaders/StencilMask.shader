@@ -9,7 +9,7 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry-100"}
+        Tags { "RenderType"="Opaque" "Queue"="Geometry-100" "ForceNoShadowCasting" = "True" }
         LOD 200
 
         Stencil

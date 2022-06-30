@@ -4,24 +4,29 @@ using UnityEngine;
 
 public class Collectable : MonoBehaviour
 {
-    private enum ITEM_IDS { Axe = 0, Sword = 1 }
+    
     public int ItemID { get { return (int)_itemID; } }
 
     [SerializeField]
     private LayerMask _collectablesLayerMask;
     [SerializeField]
-    private ITEM_IDS _itemID;
+    private ItemID _itemID;
     [SerializeField]
     private int _amount;
     [SerializeField]
     private int _maxAmount;
     [SerializeField]
     private ItemType _itemType;
+    [SerializeField]
+    private float _distanceToPickUp = 1; // minimum distance to be able for player to pick up this item
+
     public int Amount { get { return _amount; } }
     public int MaxAmount { get { return _maxAmount; } }
     public ItemType Type { get { return _itemType; } }
     private GameObject _collectableIcon;
+
     private bool _iconActivated;
+    public bool IconActivated => _iconActivated;
     
 
     private void Awake()
@@ -33,20 +38,20 @@ public class Collectable : MonoBehaviour
     private void Update()
     {
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, float.PositiveInfinity, _collectablesLayerMask))
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, float.PositiveInfinity, _collectablesLayerMask) && Utils.GetDistanceToPlayer(transform.position, Utils.X_AXIS | Utils.Z_AXIS) <= _distanceToPickUp)
         {
             if (hit.collider.gameObject == this.gameObject && !_iconActivated)
             {
                 _iconActivated = true;
                 _collectableIcon.SetActive(true);
             }
-            else
+        }
+        else
+        {
+            if (_iconActivated)
             {
-                if (_iconActivated)
-                {
-                    _iconActivated = false;
-                    _collectableIcon.SetActive(false);
-                }
+                _iconActivated = false;
+                _collectableIcon.SetActive(false);
             }
         }
     }
